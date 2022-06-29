@@ -40,12 +40,13 @@ contract MultiSigWallet {
 
     address[] public admins;
     // admins that are required to approve a transaction
-    uint256 immutable required;
+    uint256 required;
 
     constructor(address[] memory _admins, uint256 _required) {
         required = _required;
 
         require(_admins.length > 0, "add more admins");
+        require(_admins.length >= required, "admins > required");
 
         for (uint256 i = 0; i < _admins.length; i++) {
             isAdmin[_admins[i]] = true;
@@ -120,5 +121,9 @@ contract MultiSigWallet {
                 count++;
             }
         }
+    }
+
+    function getAllAdmins() external view returns (address[] memory) {
+        return admins;
     }
 }
