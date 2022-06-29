@@ -96,7 +96,7 @@ contract MultiSigWallet {
         );
 
         require(
-            !transactions[_transactionId].executed,
+            transactions[_transactionId].executed,
             "transaction is already executed"
         );
 
