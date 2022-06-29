@@ -82,6 +82,10 @@ contract MultiSigWallet {
         adminOnly
         validTransactionId(_transactionId)
     {
+        require(
+            !approved[_transactionId][msg.sender],
+            "you have already approved this transaction"
+        );
         approved[_transactionId][msg.sender] = true;
         emit Approve(msg.sender, _transactionId);
     }
@@ -97,7 +101,7 @@ contract MultiSigWallet {
         );
 
         require(
-            transactions[_transactionId].executed,
+            !transactions[_transactionId].executed,
             "transaction is already executed"
         );
 
@@ -125,5 +129,9 @@ contract MultiSigWallet {
 
     function getAllAdmins() external view returns (address[] memory) {
         return admins;
+    }
+
+    function getAllTransactions() external view returns (Transaction[] memory) {
+        return transactions;
     }
 }
