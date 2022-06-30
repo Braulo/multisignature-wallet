@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 
 contract MultiSigWallet {
@@ -17,8 +18,28 @@ contract MultiSigWallet {
         _;
     }
 
+    modifier validApproval(uint256 transactionId) {
+        require(
+            getApprovalCountFromTransaction(transactionId) >= required,
+            "not enough admins have approved this transaction"
+        );
+        _;
+    }
+
+    modifier notExecuted(uint256 transactionId) {
+        require(
+            !transactions[transactionId].executed,
+            "transaction is already executed"
+        );
+        _;
+    }
     event Deposit(address indexed from, uint256 value);
+    event DepositERC20(address indexed from, address token, uint256 ammount);
     event Request(address indexed requester, uint256 indexed transactionId);
+    event RequestERC20(
+        address indexed requester,
+        uint256 indexed transactionId
+    );
     event Approve(address indexed approver, uint256 indexed transactionId);
     event Execute(address indexed executor, uint256 indexed transactionId);
 
@@ -28,6 +49,7 @@ contract MultiSigWallet {
         address to;
         uint256 value;
         bytes data;
+        address token;
         bool executed;
     }
 
@@ -58,6 +80,30 @@ contract MultiSigWallet {
         emit Deposit(msg.sender, msg.value);
     }
 
+    function depositERC20ToWallet(address _token, uint256 _ammount) external {
+        IERC20(_token).transferFrom(msg.sender, address(this), _ammount);
+        emit DepositERC20(msg.sender, _token, _ammount);
+    }
+
+    function createTransactionRequestForERC20(
+        address _to,
+        uint256 _ammount,
+        address _token
+    ) external adminOnly {
+        transactions.push(
+            Transaction({
+                requester: msg.sender,
+                to: _to,
+                value: _ammount,
+                data: bytes("0"),
+                token: _token,
+                executed: false
+            })
+        );
+
+        emit RequestERC20(msg.sender, transactions.length - 1);
+    }
+
     function createTransactionRequest(
         address _to,
         uint256 _value,
@@ -70,6 +116,7 @@ contract MultiSigWallet {
                 to: _to,
                 value: _value,
                 data: _data,
+                token: address(0),
                 executed: false
             })
         );
@@ -94,25 +141,29 @@ contract MultiSigWallet {
         public
         adminOnly
         validTransactionId(_transactionId)
+        validApproval(_transactionId)
+        notExecuted(_transactionId)
     {
-        require(
-            getApprovalCountFromTransaction(_transactionId) >= required,
-            "not enough admins have approved this transaction"
-        );
-
-        require(
-            !transactions[_transactionId].executed,
-            "transaction is already executed"
-        );
-
         Transaction storage transaction = transactions[_transactionId];
         transaction.executed = true;
-        (bool success, ) = transaction.to.call{value: transaction.value}(
-            transaction.data
-        );
 
-        require(success, "something went wrong");
-        emit Execute(msg.sender, _transactionId);
+        // ERC20 transaction
+        if (transaction.token != address(0)) {
+            IERC20(transaction.token).transfer(
+                transaction.to,
+                transaction.value
+            );
+            emit Execute(msg.sender, _transactionId);
+        }
+        // ether transaction
+        else {
+            (bool success, ) = transaction.to.call{value: transaction.value}(
+                transaction.data
+            );
+
+            require(success, "something went wrong");
+            emit Execute(msg.sender, _transactionId);
+        }
     }
 
     function getApprovalCountFromTransaction(uint256 _transactionId)
@@ -133,5 +184,13 @@ contract MultiSigWallet {
 
     function getAllTransactions() external view returns (Transaction[] memory) {
         return transactions;
+    }
+
+    function getContractERC20Balance(address _token)
+        public
+        view
+        returns (uint256)
+    {
+        return IERC20(_token).balanceOf(address(this));
     }
 }
