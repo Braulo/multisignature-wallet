@@ -103,7 +103,7 @@ contract MultiSigWallet is IERC721Receiver {
         emit DepositERC20(msg.sender, _token, _ammount);
     }
 
-    function DepositERC721ToWallet(address _token, uint256 _tokenId) external {
+    function depositERC721ToWallet(address _token, uint256 _tokenId) external {
         IERC721(_token).safeTransferFrom(msg.sender, address(this), _tokenId);
         emit DepositERC721(msg.sender, _token, _tokenId);
     }

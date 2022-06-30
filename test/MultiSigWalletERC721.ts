@@ -31,7 +31,7 @@ describe("MultiSigWallet", function () {
 
   it("should deposit ERC721 token to wallet", async () => {
     await contractERC721TestToken.approve(contractMultiSigWallet.address, 1);
-    await contractMultiSigWallet.DepositERC721ToWallet(
+    await contractMultiSigWallet.depositERC721ToWallet(
       contractERC721TestToken.address,
       1
     );
