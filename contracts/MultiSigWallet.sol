@@ -60,14 +60,16 @@ contract MultiSigWallet is IERC721Receiver {
         bool executed;
     }
 
-    mapping(address => bool) public isAdmin;
-    // transactionId => (admin => idApproved)
+    /// @dev transactionId => (admin => idApproved)
     mapping(uint256 => mapping(address => bool)) public approved;
+    mapping(address => bool) public isAdmin;
+
     Transaction[] public transactions;
     address[] public admins;
-    // admins that are required to approve a transaction
     uint256 required;
 
+    /// @param _admins addresses that can sign / approve / request / execute a transaction
+    /// @param _required how many admins have to approve a transaction before it can be executed
     constructor(address[] memory _admins, uint256 _required) {
         required = _required;
 
@@ -80,7 +82,8 @@ contract MultiSigWallet is IERC721Receiver {
         }
     }
 
-    // this will get executed when erc721 is transfered to the contract
+    /// @dev this will get executed when an ERC721 token is transfered to the contract
+    /// @dev is from the IERC721Receiver contract
     function onERC721Received(
         address operator,
         address from,
@@ -94,20 +97,33 @@ contract MultiSigWallet is IERC721Receiver {
         return this.onERC721Received.selector;
     }
 
+    /// @notice only for ether deposits to this contract
     function depositToWallet() external payable {
         emit Deposit(msg.sender, msg.value);
     }
 
+    /// @dev the approve() function has to be called first
+    /// @dev used only for ERC20 tokens
+    /// @param _token address of the ERC721 token
+    /// @param _ammount how much we want to deposit to this contract
     function depositERC20ToWallet(address _token, uint256 _ammount) external {
         IERC20(_token).transferFrom(msg.sender, address(this), _ammount);
         emit DepositERC20(msg.sender, _token, _ammount);
     }
 
+    /// @dev the approve() function has to be called first
+    /// @dev used only for ERC721 tokens, will call the onERC721Received() function if transfered
+    /// @param _token address of the ERC721 token
+    /// @param _tokenId id of the token we want to deposit to this contract
     function depositERC721ToWallet(address _token, uint256 _tokenId) external {
         IERC721(_token).safeTransferFrom(msg.sender, address(this), _tokenId);
         emit DepositERC721(msg.sender, _token, _tokenId);
     }
 
+    /// @notice creates a new transaction request for ERC721 tokens only
+    /// @dev contract has to be funded with an ERC721 token first, sets 'data' to null by default
+    /// @param  _tokenId of the ERC721 we want to use, value = _tokenId
+    /// @param  _token address of the ERC721 token we want to use
     function createTransactionRequestForERC721(
         address _to,
         uint256 _tokenId,
@@ -127,16 +143,20 @@ contract MultiSigWallet is IERC721Receiver {
         emit RequestERC721(msg.sender, transactions.length - 1);
     }
 
+    /// @notice creates a new transaction request for ERC20 tokens only
+    /// @dev contract has to be funded with an ERC20 token first, sets 'data' to null by default
+    /// @param  _value ammount you want to send
+    /// @param  _token address of the ERC20 token we want to use
     function createTransactionRequestForERC20(
         address _to,
-        uint256 _ammount,
+        uint256 _value,
         address _token
     ) external adminOnly {
         transactions.push(
             Transaction({
                 requester: msg.sender,
                 to: _to,
-                value: _ammount,
+                value: _value,
                 data: bytes("0"),
                 erc20Token: _token,
                 erc721Token: address(0),
@@ -147,6 +167,10 @@ contract MultiSigWallet is IERC721Receiver {
         emit RequestERC20(msg.sender, transactions.length - 1);
     }
 
+    /// @notice creates a new transaction request
+    /// @dev contract has to be funded first
+    /// @param  _value ammount you want to send
+    /// @param  _data optional
     function createTransactionRequest(
         address _to,
         uint256 _value,
@@ -167,6 +191,9 @@ contract MultiSigWallet is IERC721Receiver {
         emit Request(msg.sender, transactions.length - 1);
     }
 
+    /// @notice can be called by an admin and approves a transaction request (can't be revoked)
+    /// @dev it does not matter if the transaction contains an ERC20/ ERC721 token
+    /// @param _transactionId identifer for the transaction we want to approve
     function approveTransactionRequest(uint256 _transactionId)
         external
         adminOnly
@@ -180,6 +207,9 @@ contract MultiSigWallet is IERC721Receiver {
         emit Approve(msg.sender, _transactionId);
     }
 
+    /// @notice this function will check if the requested transaction is ERC20/ ERC721 / Ether
+    /// @dev when using ERC721 tokens the 'value' of the transaction is actually the tokenId
+    /// @param _transactionId identifer for the transaction we want to execute
     function executeTransaction(uint256 _transactionId)
         public
         adminOnly
@@ -190,25 +220,20 @@ contract MultiSigWallet is IERC721Receiver {
         Transaction storage transaction = transactions[_transactionId];
         transaction.executed = true;
 
-        // ERC20 transaction
         if (transaction.erc20Token != address(0)) {
             IERC20(transaction.erc20Token).transfer(
                 transaction.to,
                 transaction.value
             );
             emit Execute(msg.sender, _transactionId);
-        }
-        // ERC721 transaction
-        else if (transaction.erc721Token != address(0)) {
+        } else if (transaction.erc721Token != address(0)) {
             IERC721(transaction.erc721Token).safeTransferFrom(
                 address(this),
                 transaction.to,
                 transaction.value
             );
             emit Execute(msg.sender, _transactionId);
-        }
-        // ether transaction
-        else {
+        } else {
             (bool success, ) = transaction.to.call{value: transaction.value}(
                 transaction.data
             );
