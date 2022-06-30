@@ -1,14 +1,14 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { ERC20TestToken, MultiSigWallet } from "../typechain";
+import { ERC721TestToken, MultiSigWallet } from "../typechain";
 
 describe("MultiSigWallet", function () {
   const required = 3;
   let contractMultiSigWallet: MultiSigWallet;
   let adminAddresses: string[] = [];
   let signers: SignerWithAddress[];
-  let contractERC20TestToken: ERC20TestToken;
+  let contractERC721TestToken: ERC721TestToken;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -23,34 +23,29 @@ describe("MultiSigWallet", function () {
     );
     await contractMultiSigWallet.deployed();
 
-    const ERC20TestToken = await ethers.getContractFactory("ERC20TestToken");
-    contractERC20TestToken = await ERC20TestToken.deploy(
-      "TestToken",
-      "TST",
-      100
-    );
+    const ERC721TestToken = await ethers.getContractFactory("ERC721TestToken");
+    contractERC721TestToken = await ERC721TestToken.deploy("TestToken", "TST");
 
-    await contractERC20TestToken.deployed();
+    await contractERC721TestToken.deployed();
   });
 
-  it("should deposit ERC20 token to wallet", async function () {
-    // approve the tokens to the contract
-    await contractERC20TestToken.approve(contractMultiSigWallet.address, 100);
-    await contractMultiSigWallet.depositERC20ToWallet(
-      contractERC20TestToken.address,
-      10
+  it("should deposit ERC721 token to wallet", async () => {
+    await contractERC721TestToken.approve(contractMultiSigWallet.address, 1);
+    await contractMultiSigWallet.DepositERC721ToWallet(
+      contractERC721TestToken.address,
+      1
     );
     expect(
-      await contractERC20TestToken.balanceOf(contractMultiSigWallet.address)
-    ).to.be.equal(10);
+      await contractERC721TestToken.balanceOf(contractMultiSigWallet.address)
+    ).to.be.equal(1);
   });
 
-  it("should create a ERC20 transaction request", async function () {
+  it("should create a ERC721 transaction request", async function () {
     const transaction =
-      await contractMultiSigWallet.createTransactionRequestForERC20(
+      await contractMultiSigWallet.createTransactionRequestForERC721(
         signers[4].address,
-        10,
-        contractERC20TestToken.address
+        1,
+        contractERC721TestToken.address
       );
 
     await transaction.wait();
@@ -59,15 +54,14 @@ describe("MultiSigWallet", function () {
       (await contractMultiSigWallet.getAllTransactions()).length
     ).to.be.equal(1);
   });
-
-  it("should approve a ERC20 transaction request", async function () {
+  it("should approve a ERC721 transaction request", async function () {
     await contractMultiSigWallet.approveTransactionRequest(0);
 
     expect(await contractMultiSigWallet.approved(0, signers[0].address)).to.be
       .true;
   });
 
-  it("should execute an ERC20 transaction", async function () {
+  it("should execute an ERC721 transaction", async function () {
     const contractMultiSigWallet1 = contractMultiSigWallet.connect(signers[1]);
     const contractMultiSigWallet2 = contractMultiSigWallet.connect(signers[2]);
     await contractMultiSigWallet1.approveTransactionRequest(0);

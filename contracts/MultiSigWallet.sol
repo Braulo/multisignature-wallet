@@ -2,9 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "hardhat/console.sol";
 
-contract MultiSigWallet {
+contract MultiSigWallet is IERC721Receiver {
     modifier adminOnly() {
         require(isAdmin[msg.sender] == true, "address is not an admin");
         _;
@@ -35,8 +37,13 @@ contract MultiSigWallet {
     }
     event Deposit(address indexed from, uint256 value);
     event DepositERC20(address indexed from, address token, uint256 ammount);
+    event DepositERC721(address indexed from, address token, uint256 tokenId);
     event Request(address indexed requester, uint256 indexed transactionId);
     event RequestERC20(
+        address indexed requester,
+        uint256 indexed transactionId
+    );
+    event RequestERC721(
         address indexed requester,
         uint256 indexed transactionId
     );
@@ -48,7 +55,8 @@ contract MultiSigWallet {
         address to;
         uint256 value;
         bytes data;
-        address token;
+        address erc20Token;
+        address erc721Token;
         bool executed;
     }
 
@@ -72,6 +80,20 @@ contract MultiSigWallet {
         }
     }
 
+    // this will get executed when erc721 is transfered to the contract
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) public pure override returns (bytes4) {
+        operator;
+        from;
+        tokenId;
+        data;
+        return this.onERC721Received.selector;
+    }
+
     function depositToWallet() external payable {
         emit Deposit(msg.sender, msg.value);
     }
@@ -79,6 +101,30 @@ contract MultiSigWallet {
     function depositERC20ToWallet(address _token, uint256 _ammount) external {
         IERC20(_token).transferFrom(msg.sender, address(this), _ammount);
         emit DepositERC20(msg.sender, _token, _ammount);
+    }
+
+    function DepositERC721ToWallet(address _token, uint256 _tokenId) external {
+        IERC721(_token).safeTransferFrom(msg.sender, address(this), _tokenId);
+        emit DepositERC721(msg.sender, _token, _tokenId);
+    }
+
+    function createTransactionRequestForERC721(
+        address _to,
+        uint256 _tokenId,
+        address _token
+    ) external adminOnly {
+        transactions.push(
+            Transaction({
+                requester: msg.sender,
+                to: _to,
+                value: _tokenId,
+                data: bytes("0"),
+                erc20Token: address(0),
+                erc721Token: _token,
+                executed: false
+            })
+        );
+        emit RequestERC721(msg.sender, transactions.length - 1);
     }
 
     function createTransactionRequestForERC20(
@@ -92,7 +138,8 @@ contract MultiSigWallet {
                 to: _to,
                 value: _ammount,
                 data: bytes("0"),
-                token: _token,
+                erc20Token: _token,
+                erc721Token: address(0),
                 executed: false
             })
         );
@@ -111,7 +158,8 @@ contract MultiSigWallet {
                 to: _to,
                 value: _value,
                 data: _data,
-                token: address(0),
+                erc20Token: address(0),
+                erc721Token: address(0),
                 executed: false
             })
         );
@@ -143,8 +191,17 @@ contract MultiSigWallet {
         transaction.executed = true;
 
         // ERC20 transaction
-        if (transaction.token != address(0)) {
-            IERC20(transaction.token).transfer(
+        if (transaction.erc20Token != address(0)) {
+            IERC20(transaction.erc20Token).transfer(
+                transaction.to,
+                transaction.value
+            );
+            emit Execute(msg.sender, _transactionId);
+        }
+        // ERC721 transaction
+        else if (transaction.erc721Token != address(0)) {
+            IERC721(transaction.erc721Token).safeTransferFrom(
+                address(this),
                 transaction.to,
                 transaction.value
             );
@@ -179,13 +236,5 @@ contract MultiSigWallet {
 
     function getAllTransactions() external view returns (Transaction[] memory) {
         return transactions;
-    }
-
-    function getContractERC20Balance(address _token)
-        public
-        view
-        returns (uint256)
-    {
-        return IERC20(_token).balanceOf(address(this));
     }
 }
