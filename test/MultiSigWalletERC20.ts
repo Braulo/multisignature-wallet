@@ -34,6 +34,7 @@ describe("MultiSigWallet", function () {
   });
 
   it("should deposit ERC20 token to wallet", async function () {
+    // approve the tokens
     await contractERC20TestToken.approve(contractMultiSigWallet.address, 100);
     await contractMultiSigWallet.depositERC20ToWallet(
       contractERC20TestToken.address,
@@ -44,5 +45,37 @@ describe("MultiSigWallet", function () {
         contractERC20TestToken.address
       )
     ).to.be.equal(10);
+  });
+
+  it("should create a ERC20 transaction request", async function () {
+    const transaction =
+      await contractMultiSigWallet.createTransactionRequestForERC20(
+        signers[4].address,
+        10,
+        contractERC20TestToken.address
+      );
+
+    await transaction.wait();
+
+    expect(
+      (await contractMultiSigWallet.getAllTransactions()).length
+    ).to.be.equal(1);
+  });
+
+  it("should approve a ERC20 transaction request", async function () {
+    await contractMultiSigWallet.approveTransactionRequest(0);
+
+    expect(await contractMultiSigWallet.approved(0, signers[0].address)).to.be
+      .true;
+  });
+
+  it("should execute an ERC20 transaction", async function () {
+    const contractMultiSigWallet1 = contractMultiSigWallet.connect(signers[1]);
+    const contractMultiSigWallet2 = contractMultiSigWallet.connect(signers[2]);
+    await contractMultiSigWallet1.approveTransactionRequest(0);
+    await contractMultiSigWallet2.approveTransactionRequest(0);
+
+    await contractMultiSigWallet.executeTransaction(0);
+    expect((await contractMultiSigWallet.transactions(0)).executed).to.be.true;
   });
 });

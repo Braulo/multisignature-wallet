@@ -43,7 +43,6 @@ contract MultiSigWallet {
     event Approve(address indexed approver, uint256 indexed transactionId);
     event Execute(address indexed executor, uint256 indexed transactionId);
 
-    // Todo => add ERC20 / ERC721 (token address)
     struct Transaction {
         address requester;
         address to;
@@ -54,12 +53,9 @@ contract MultiSigWallet {
     }
 
     mapping(address => bool) public isAdmin;
-
     // transactionId => (admin => idApproved)
     mapping(uint256 => mapping(address => bool)) public approved;
-
     Transaction[] public transactions;
-
     address[] public admins;
     // admins that are required to approve a transaction
     uint256 required;
@@ -109,7 +105,6 @@ contract MultiSigWallet {
         uint256 _value,
         bytes memory _data
     ) external adminOnly {
-        // Todo => maybe check if value is within the range (address(this).balance) to spend
         transactions.push(
             Transaction({
                 requester: msg.sender,
