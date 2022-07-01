@@ -54,16 +54,11 @@ describe("MultiSigWallet", function () {
       (await contractMultiSigWallet.getAllTransactions()).length
     ).to.be.equal(1);
   });
-  it("should approve a ERC721 transaction request", async function () {
-    await contractMultiSigWallet.approveTransactionRequest(0);
-
-    expect(await contractMultiSigWallet.approved(0, signers[0].address)).to.be
-      .true;
-  });
 
   it("should execute an ERC721 transaction", async function () {
     const contractMultiSigWallet1 = contractMultiSigWallet.connect(signers[1]);
     const contractMultiSigWallet2 = contractMultiSigWallet.connect(signers[2]);
+    await contractMultiSigWallet.approveTransactionRequest(0);
     await contractMultiSigWallet1.approveTransactionRequest(0);
     await contractMultiSigWallet2.approveTransactionRequest(0);
 
