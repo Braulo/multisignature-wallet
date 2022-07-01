@@ -2,6 +2,8 @@
 
 This repository contains a simple fully tested n of m\* MultiSigWallet contract that can be used with ERC20, ERC721 and Ether tokens.
 
+TODO: Might develop a frontend interface in the future ;)
+
 - not all signers have to approve a transaction only until the 'required' amount is reached
 
 ### Development
