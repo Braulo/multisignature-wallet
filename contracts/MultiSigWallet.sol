@@ -36,7 +36,7 @@ contract MultiSigWallet is IERC721Receiver {
         _;
     }
     event Deposit(address indexed from, uint256 value);
-    event DepositERC20(address indexed from, address token, uint256 ammount);
+    event DepositERC20(address indexed from, address token, uint256 amount);
     event DepositERC721(address indexed from, address token, uint256 tokenId);
     event Request(address indexed requester, uint256 indexed transactionId);
     event RequestERC20(
@@ -105,10 +105,10 @@ contract MultiSigWallet is IERC721Receiver {
     /// @dev the approve() function has to be called first
     /// @dev used only for ERC20 tokens
     /// @param _token address of the ERC721 token
-    /// @param _ammount how much we want to deposit to this contract
-    function depositERC20ToWallet(address _token, uint256 _ammount) external {
-        IERC20(_token).transferFrom(msg.sender, address(this), _ammount);
-        emit DepositERC20(msg.sender, _token, _ammount);
+    /// @param _amount how much we want to deposit to this contract
+    function depositERC20ToWallet(address _token, uint256 _amount) external {
+        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+        emit DepositERC20(msg.sender, _token, _amount);
     }
 
     /// @dev the approve() function has to be called first
@@ -145,7 +145,7 @@ contract MultiSigWallet is IERC721Receiver {
 
     /// @notice creates a new transaction request for ERC20 tokens only
     /// @dev contract has to be funded with an ERC20 token first, sets 'data' to null by default
-    /// @param  _value ammount you want to send
+    /// @param  _value amount you want to send
     /// @param  _token address of the ERC20 token we want to use
     function createTransactionRequestForERC20(
         address _to,
@@ -169,7 +169,7 @@ contract MultiSigWallet is IERC721Receiver {
 
     /// @notice creates a new transaction request
     /// @dev contract has to be funded first
-    /// @param  _value ammount you want to send
+    /// @param  _value amount you want to send
     /// @param  _data optional
     function createTransactionRequest(
         address _to,
