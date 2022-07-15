@@ -1,7 +1,7 @@
 import { FC } from "react";
-import Button from "../Button";
 import Link from "next/link";
 import ThemeToggle from "../../ThemeToggle";
+import ConnectWallet from "../../ConnectWallet";
 
 const Navbar: FC = () => {
   return (
@@ -12,7 +12,7 @@ const Navbar: FC = () => {
         <Link href="/">Multisig-Wallet</Link>
       </div>
       <div className="flex items-stretch">
-        <Button className="mr-4">Connect Wallet</Button>
+        <ConnectWallet />
         <ThemeToggle />
       </div>
     </nav>
