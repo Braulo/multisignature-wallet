@@ -1,4 +1,4 @@
-# MultiSigWallet for ERC20, ERC721 and Ether.
+# MultiSigWallet for ERC20, ERC721 and Ether transactions.
 
 This repository contains a simple fully tested n of m\* MultiSigWallet contract that can be used with ERC20, ERC721 and Ether tokens.
 
