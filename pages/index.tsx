@@ -7,9 +7,11 @@ const Home: NextPage = () => {
     <>
       <div className="p-4 flex justify-center items-center">
         <Button className="mr-4">
-          <Link href="create">Create</Link>
+          <Link href="/wallet/create">Create</Link>
         </Button>
-        <Button>Import</Button>
+        <Button className="mr-4">
+          <Link href="/wallet/import">Import</Link>
+        </Button>
       </div>
     </>
   );
