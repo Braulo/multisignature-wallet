@@ -6,12 +6,12 @@ const Home: NextPage = () => {
   return (
     <>
       <div className="p-4 flex justify-center items-center">
-        <Button className="mr-4">
-          <Link href="/wallet/create">Create</Link>
-        </Button>
-        <Button className="mr-4">
-          <Link href="/wallet/import">Import</Link>
-        </Button>
+        {/* <Link href="/wallet/create"> */}
+        <Button className="mr-4">Create</Button>
+        {/* </Link> */}
+        {/* <Link href="/wallet/import"> */}
+        <Button className="mr-4">Import</Button>
+        {/* </Link> */}
       </div>
     </>
   );

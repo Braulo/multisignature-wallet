@@ -27,7 +27,7 @@ export const useWeb3 = () => {
   const createTransactionRequest = async () => {
     console.log("test");
 
-    const contract = selector.contract;
+    const contract = selector.web3Reducer.contract;
     await contract?.createTransactionRequest(
       "0xC2c8809CC17aE602495e1bE04847fFCB142dA9d2",
       10,
@@ -56,7 +56,7 @@ export const useWeb3 = () => {
 
   return {
     connectWallet,
-    selector,
+    selector: selector.web3Reducer,
     setMultiSigWalletContract,
     createTransactionRequest,
   };
