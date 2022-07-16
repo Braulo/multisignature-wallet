@@ -1,8 +1,13 @@
 import Button from "../UI/Button";
 import { useWeb3 } from "../../hooks/use-web3";
+import { useEffect } from "react";
 
 const ConnectWallet = () => {
-  const { connectWallet, selector } = useWeb3();
+  const { connectWallet, selector, setProvider } = useWeb3();
+
+  useEffect(() => {
+    setProvider();
+  }, []);
 
   return (
     <>

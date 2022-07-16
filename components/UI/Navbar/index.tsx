@@ -2,13 +2,13 @@ import { FC } from "react";
 import Link from "next/link";
 import ThemeToggle from "../../ThemeToggle";
 import ConnectWallet from "../../ConnectWallet";
-import Button from "../Button";
 import { useDispatch } from "react-redux";
 import { toggleShowSidenav } from "../../../store/app/app.store";
 import { AiOutlineMenu } from "react-icons/ai";
 
 const Navbar: FC = () => {
   const dispatch = useDispatch();
+
   return (
     <nav
       className={`w-100 dark:bg-black bg-white flex flex-wrap justify-between items-center p-4`}

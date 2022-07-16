@@ -1,38 +1,46 @@
 import { useSelector, useDispatch } from "react-redux";
-import { Contract, ethers } from "ethers";
-import {
-  updateUserAddress,
-  updateMultiSigWalletContract,
-} from "../store/web3/web3.store";
+import { ethers } from "ethers";
+import { updateProvider, updateUserAddress } from "../store/web3/web3.store";
 import { RootState } from "../store";
-import MultisigWallet from "../artifacts/contracts/MultiSigWallet.sol/MultiSigWallet.json";
-import { MultiSigWallet } from "../typechain/MultiSigWallet";
 
 export const useWeb3 = () => {
   const dispatch = useDispatch();
   const selector = useSelector((state: RootState) => state);
 
-  const setMultiSigWalletContract = async (address: string) => {
-    const contract = new ethers.Contract(
-      "0xC2c8809CC17aE602495e1bE04847fFCB142dA9d2",
-      MultisigWallet.abi,
-      new ethers.providers.Web3Provider((window as any).ethereum).getSigner()
-    ) as MultiSigWallet & Contract;
+  const setProvider = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(
+        (window as any).ethereum,
+        "any"
+      );
 
-    dispatch(updateMultiSigWalletContract(contract));
+      (window as any).ethereum.on("accountsChanged", async () => {
+        try {
+          dispatch(updateUserAddress(await provider.getSigner().getAddress()));
+          dispatch(updateProvider(provider));
+        } catch (error) {
+          dispatch(updateUserAddress(""));
+          dispatch(updateProvider(null));
+        }
+      });
+      (window as any).ethereum.on("chainChanged", async () => {
+        dispatch(updateUserAddress(await provider.getSigner().getAddress()));
+        dispatch(updateProvider(provider));
+      });
 
-    // console.log(await contract.getAllAdmins());
-  };
+      const accounts = await provider.listAccounts();
 
-  const createTransactionRequest = async () => {
-    console.log("test");
+      if (accounts.length == 0) {
+        return null;
+      }
 
-    const contract = selector.web3Reducer.contract;
-    await contract?.createTransactionRequest(
-      "0xC2c8809CC17aE602495e1bE04847fFCB142dA9d2",
-      10,
-      [0]
-    );
+      dispatch(updateUserAddress(await provider.getSigner().getAddress()));
+      dispatch(updateProvider(provider));
+
+      return provider;
+    } catch (error) {
+      return null;
+    }
   };
 
   const connectWallet = async () => {
@@ -42,10 +50,10 @@ export const useWeb3 = () => {
           (window as any).ethereum,
           "any"
         );
-
         await provider.send("eth_requestAccounts", []);
 
         dispatch(updateUserAddress(await provider.getSigner().getAddress()));
+        dispatch(updateProvider(provider));
       } catch (error) {
         console.log(error);
       }
@@ -57,7 +65,6 @@ export const useWeb3 = () => {
   return {
     connectWallet,
     selector: selector.web3Reducer,
-    setMultiSigWalletContract,
-    createTransactionRequest,
+    setProvider,
   };
 };

@@ -1,16 +1,36 @@
-import { useEffect } from "react";
 import Button from "../../components/UI/Button";
-import { useWeb3 } from "../../hooks/use-web3";
+import { useWalletContract } from "../../hooks/use-walletContract";
+import Input from "../../components/UI/Input";
+import { useState } from "react";
 
 const ImportMultiSigWallet = () => {
-  const { createTransactionRequest, setMultiSigWalletContract } = useWeb3();
-  useEffect(() => {
-    setMultiSigWalletContract("");
-  }, []);
+  const [address, setAddress] = useState("");
+
+  const { importMultiSigWalletContract } = useWalletContract();
+
+  const onSubmitHandler = (event) => {
+    event.preventDefault();
+    importMultiSigWalletContract(address);
+    setAddress("");
+  };
+
+  const onChangeHandler = (event) => {
+    setAddress(event.target.value);
+  };
+
   return (
     <>
-      <h1>Import wallet</h1>
-      <Button onClick={() => createTransactionRequest()}>Test</Button>
+      <div className="m-auto w-1/2">
+        <form onSubmit={onSubmitHandler}>
+          <Input
+            name="Wallet Address"
+            placeholder="0x21"
+            onChange={onChangeHandler}
+            value={address}
+          />
+          <Button>Import</Button>
+        </form>
+      </div>
     </>
   );
 };

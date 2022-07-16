@@ -1,4 +1,5 @@
 import { FC, PropsWithChildren } from "react";
+import finalPropsSelectorFactory from "react-redux/es/connect/selectorFactory";
 
 interface IButton {
   className?: string;
