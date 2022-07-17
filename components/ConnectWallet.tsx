@@ -1,5 +1,5 @@
-import Button from "../UI/Button";
-import { useWeb3 } from "../../hooks/use-web3";
+import Button from "./UI/Button";
+import { useWeb3 } from "../hooks/use-web3";
 import { useEffect } from "react";
 
 const ConnectWallet = () => {
@@ -12,7 +12,7 @@ const ConnectWallet = () => {
   return (
     <>
       {selector.isConnected ? (
-        <h1 className="dark:text-white text-black self-center mr-4 select-none">
+        <h1 className="self-center mr-4">
           {selector.userAddress.substring(0, 5)}...
           {selector.userAddress.substring(
             selector.userAddress.length - 4,
@@ -20,7 +20,7 @@ const ConnectWallet = () => {
           )}
         </h1>
       ) : (
-        <Button className="mr-4 select-none" onClick={connectWallet}>
+        <Button className="mr-4" onClick={connectWallet}>
           Connect Wallet
         </Button>
       )}
