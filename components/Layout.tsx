@@ -1,6 +1,6 @@
 import { PropsWithChildren, FC } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { RootState } from "../state/store";
 import Navbar from "./UI/Navbar";
 import Sidenav from "./UI/Sidenav";
 

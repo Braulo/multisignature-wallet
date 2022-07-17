@@ -14,7 +14,7 @@ const Input: FC<IInput> = (props) => {
         {props.name}
       </label>
       <input
-        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+        className="text-black shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
         id={props.name}
         type="text"
         value={props.value}

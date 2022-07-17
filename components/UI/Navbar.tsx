@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { FC, useContext, useEffect } from "react";
 import Link from "next/link";
 import ThemeToggle from "../UI/ThemeToggle";
 import ConnectWallet from "../ConnectWallet";
 import { useDispatch } from "react-redux";
-import { toggleShowSidenav } from "../../store/app/app.store";
+import { toggleShowSidenav } from "../../state/store/app/app.store";
 import { AiOutlineMenu } from "react-icons/ai";
 
 const Navbar: FC = () => {

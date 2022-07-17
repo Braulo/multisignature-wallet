@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
-import { toggleShowSidenav } from "../../store/app/app.store";
+import { toggleShowSidenav } from "../../state/store/app/app.store";
 
 const links = [
+  {
+    route: "/wallet",
+    name: "My Wallets",
+  },
   {
     route: "/wallet/create",
     name: "Create",
@@ -11,10 +15,6 @@ const links = [
   {
     route: "/wallet/import",
     name: "Import",
-  },
-  {
-    route: "/wallet/my",
-    name: "My Wallets",
   },
 ];
 const Sidenav = () => {

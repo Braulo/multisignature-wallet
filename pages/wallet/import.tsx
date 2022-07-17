@@ -1,16 +1,15 @@
 import Button from "../../components/UI/Button";
-import { useWalletContract } from "../../hooks/use-walletContract";
 import Input from "../../components/UI/Input";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { WalletContext } from "../../state/context/walletContextProvider";
 
 const ImportMultiSigWallet = () => {
   const [address, setAddress] = useState("");
-
-  const { importMultiSigWalletContract } = useWalletContract();
+  const walletContext = useContext(WalletContext);
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
-    importMultiSigWalletContract(address);
+    walletContext.importMultiSigWalletContract(address);
     setAddress("");
   };
 

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { MdDarkMode, MdWbSunny } from "react-icons/md";
-import { useTheme } from "../../hooks/use-theme";
+import { useTheme } from "../../hooks/useTheme";
 import Button from "./Button";
 
 const ThemeToggle: FC = () => {

@@ -1,26 +1,32 @@
 import Button from "./UI/Button";
-import { useWeb3 } from "../hooks/use-web3";
-import { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Web3Context } from "../state/context/web3ContextProvider";
 
 const ConnectWallet = () => {
-  const { connectWallet, selector, setProvider } = useWeb3();
+  const web3Context = useContext(Web3Context);
+  const [userAddressFormatted, setUserAddressFormatted] = useState("");
 
   useEffect(() => {
-    setProvider();
+    web3Context.automaticWalletConnect().catch();
   }, []);
+
+  useEffect(() => {
+    setUserAddressFormatted(
+      web3Context.userAddress?.substring(0, 5) +
+        "..." +
+        web3Context.userAddress?.substring(
+          web3Context.userAddress.length - 4,
+          web3Context.userAddress.length
+        )
+    );
+  }, [web3Context.userAddress]);
 
   return (
     <>
-      {selector.isConnected ? (
-        <h1 className="self-center mr-4">
-          {selector.userAddress.substring(0, 5)}...
-          {selector.userAddress.substring(
-            selector.userAddress.length - 4,
-            selector.userAddress.length
-          )}
-        </h1>
+      {web3Context.userAddress !== "" ? (
+        <h1 className="self-center mr-4">{userAddressFormatted}</h1>
       ) : (
-        <Button className="mr-4" onClick={connectWallet}>
+        <Button className="mr-4" onClick={web3Context.connectWallet}>
           Connect Wallet
         </Button>
       )}
