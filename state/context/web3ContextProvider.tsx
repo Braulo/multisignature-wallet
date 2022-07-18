@@ -1,22 +1,27 @@
 import { ethers } from "ethers";
 import { createContext, FC, PropsWithChildren, useReducer } from "react";
 
-export const Web3Context = createContext<{
-  provider: ethers.providers.Web3Provider | null;
-  connectWallet: () => void;
-  userAddress?: string;
-  automaticWalletConnect: () => Promise<void>;
-}>({
-  provider: null,
+interface IInitialReducerWeb3State {
+  provider: ethers.providers.Web3Provider;
+  userAddress: string;
+}
+
+const initialState: IInitialReducerWeb3State = {
+  provider: {} as ethers.providers.Web3Provider,
+  userAddress: "",
+};
+
+export const Web3Context = createContext({
+  provider: {} as ethers.providers.Web3Provider,
   connectWallet: () => {},
   userAddress: "",
   automaticWalletConnect: () => Promise.resolve(),
 });
 
 const web3Reducer = (
-  state = { provider: null },
+  state = initialState,
   action: { type: string; payload: any }
-) => {
+): IInitialReducerWeb3State => {
   switch (action.type) {
     case "SET_PROVIDER":
       return {
@@ -25,7 +30,7 @@ const web3Reducer = (
         userAddress: action.payload.userAddress,
       };
     default:
-      break;
+      return state;
   }
 };
 
@@ -34,10 +39,7 @@ const getProvider = () => {
 };
 
 export const Web3ContextProvider: FC<PropsWithChildren> = (props) => {
-  const [state, dispatch] = useReducer(web3Reducer, {
-    provider: null,
-    userAddress: "",
-  });
+  const [state, dispatch] = useReducer(web3Reducer, initialState);
 
   const setUser = (
     provider?: ethers.providers.Web3Provider,
@@ -95,9 +97,9 @@ export const Web3ContextProvider: FC<PropsWithChildren> = (props) => {
     <>
       <Web3Context.Provider
         value={{
-          provider: state?.provider,
+          provider: state.provider,
           connectWallet,
-          userAddress: state?.userAddress,
+          userAddress: state.userAddress,
           automaticWalletConnect,
         }}
       >

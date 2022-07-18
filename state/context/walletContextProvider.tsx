@@ -6,26 +6,38 @@ import {
   useEffect,
   useReducer,
 } from "react";
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import walletContractArtifact from "../../artifacts/contracts/MultiSigWallet.sol/MultiSigWallet.json";
 import { Web3Context } from "../context/web3ContextProvider";
+import { MultiSigWallet } from "../../typechain/MultiSigWallet";
 
-export const WalletContext = createContext<{
-  walletContractsAddresses: string[];
-  importMultiSigWalletContract: (address: string) => Promise<void>;
-  createNewWallet: (admins: string[], required: number) => Promise<string>;
-  loading: boolean;
-}>({
-  walletContractsAddresses: [],
-  importMultiSigWalletContract: () => Promise.resolve(),
-  createNewWallet: (admins, required) => Promise.resolve(""),
+export const WalletContext = createContext({
+  walletContractsAddresses: [""],
   loading: false,
+  selectedWallet: {} as Contract & MultiSigWallet,
+  importMultiSigWalletContract: (address: string) => Promise.resolve(),
+  createNewWallet: (admins: string[], required: number) => Promise.resolve(""),
+  setSelectedWallet: (address: string) => {},
 });
 
+interface IInitialReducerWalletState {
+  walletContractsAddresses: string[];
+  loading: boolean;
+  selectedWallet: Contract & MultiSigWallet;
+}
+const initialState: IInitialReducerWalletState = {
+  walletContractsAddresses: [],
+  loading: false,
+  selectedWallet: {} as Contract & MultiSigWallet,
+};
+
 const walletReducer = (
-  state = { walletContractsAddresses: [""], loading: false },
-  action: { type: string; payload: any }
-) => {
+  state = initialState,
+  action: {
+    type: string;
+    payload: any;
+  }
+): IInitialReducerWalletState => {
   switch (action.type) {
     case "ADD_WALLET":
       const newState = {
@@ -51,17 +63,19 @@ const walletReducer = (
       return {
         ...state,
         loading: action.payload,
+      } as IInitialReducerWalletState;
+    case "SET_SELECTEDWALLET":
+      return {
+        ...state,
+        selectedWallet: action.payload,
       };
     default:
-      break;
+      return state;
   }
 };
 
 export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
-  const [state, dispatch] = useReducer(walletReducer, {
-    walletContractsAddresses: [],
-    loading: false,
-  });
+  const [state, dispatch] = useReducer(walletReducer, initialState);
 
   const web3Context = useContext(Web3Context);
 
@@ -79,9 +93,18 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
     dispatch({ type: "ADD_WALLET", payload: address });
   };
 
+  const setSelectedWallet = (address: string) => {
+    const walletContract = new ethers.Contract(
+      address,
+      walletContractArtifact.abi,
+      web3Context.provider?.getSigner()
+    );
+
+    dispatch({ type: "SET_SELECTEDWALLET", payload: walletContract });
+  };
+
   const createNewWallet = async (admins: string[], required: number) => {
     try {
-      console.log("create test");
       dispatch({ type: "SET_LOADING", payload: true });
       const walletContract = new ethers.ContractFactory(
         walletContractArtifact.abi,
@@ -104,10 +127,12 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
     <>
       <WalletContext.Provider
         value={{
-          walletContractsAddresses: state?.walletContractsAddresses || [],
+          walletContractsAddresses: state.walletContractsAddresses,
+          loading: state.loading,
+          selectedWallet: state.selectedWallet,
           importMultiSigWalletContract,
           createNewWallet,
-          loading: state?.loading || false,
+          setSelectedWallet,
         }}
       >
         {props.children}
