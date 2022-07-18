@@ -1,11 +1,13 @@
 import { Formik } from "formik";
 import Input from "../../components/UI/Input";
 import Button from "../../components/UI/Button";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { WalletContext } from "../../state/context/walletContextProvider";
+import { ethers } from "ethers";
 
 const CreateMultisigWallet = () => {
-  const walletContext = useContext(WalletContext);
+  const { createNewWallet, loading } = useContext(WalletContext);
+  const [message, setMessage] = useState("");
 
   return (
     <>
@@ -14,17 +16,39 @@ const CreateMultisigWallet = () => {
           Create a new multisig wallet
         </h1>
         <Formik
-          initialValues={{ admins: "", required: "" }}
-          validate={(values) => {
+          initialValues={{
+            admins:
+              "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;0x70997970C51812dc3A010C7d01b50e0d17dc79C8;0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            required: "",
+          }}
+          validate={({ admins, required }) => {
             const errors = {} as any;
-            if (!values.admins) {
+            if (!admins) {
               errors.admins = "Required";
+            } else if (+required < 0) {
+              errors.required = "Required must be greater than 0";
             }
+
+            admins.split(";").forEach((address) => {
+              if (!ethers.utils.isAddress(address)) {
+                errors.admins = `Address (${address})ist not valid`;
+              }
+            });
             return errors;
           }}
-          onSubmit={({ admins, required }, { setSubmitting, resetForm }) => {
+          validateOnChange={false}
+          onSubmit={async (
+            { admins, required },
+            { setSubmitting, resetForm }
+          ) => {
             const adminsList = admins.split(";");
-            console.log(adminsList, required);
+
+            const address = await createNewWallet(adminsList, +required);
+            setMessage(
+              address
+                ? `Contract deployed to ${address}`
+                : "Something went wrong"
+            );
 
             setSubmitting(false);
             resetForm();
@@ -40,10 +64,9 @@ const CreateMultisigWallet = () => {
             isSubmitting,
           }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <Input
-                type="text"
+              <textarea
+                className="text-black h-20"
                 name="admins"
-                labelName="Admins (seperated by ';')"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.admins}
@@ -66,6 +89,8 @@ const CreateMultisigWallet = () => {
             </form>
           )}
         </Formik>
+        {loading && <h1>Loading...</h1>}
+        {message != "" && <h1>{message}</h1>}
       </div>
     </>
   );

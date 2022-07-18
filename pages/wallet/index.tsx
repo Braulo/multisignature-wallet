@@ -22,7 +22,7 @@ const MyWallets = () => {
                 key={contract}
                 onClick={() => openContractHandler(contract)}
               >
-                {contract}
+                <button>{contract}</button>
               </li>
             );
           })}
