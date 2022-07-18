@@ -118,6 +118,7 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
       dispatch({ type: "ADD_WALLET", payload: contract.address });
       return contract.address;
     } catch (error) {
+      dispatch({ type: "SET_LOADING", payload: false });
       console.log(error);
       return "";
     }

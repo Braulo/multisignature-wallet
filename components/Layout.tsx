@@ -9,7 +9,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     (state: RootState) => state.appReducer.showSidenav
   );
   return (
-    <div className="flex flex-col text-black dark:text-white bg-white dark:bg-black h-screen">
+    <div className="flex flex-col text-black dark:text-white bg-white dark:bg-black h-screen break-all">
       <Navbar />
       {showSidenav && <Sidenav />}
       <main className="grow">{children}</main>

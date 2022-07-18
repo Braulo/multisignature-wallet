@@ -58,7 +58,7 @@ export const useSelectedWallet = (address: string) => {
       dispatch({ type: "ADD_ADMINS", payload: admins });
       dispatch({ type: "ADD_ERROR", payload: "" });
 
-      if (!(admins.indexOf(userAddress) > -1)) {
+      if (!(await selectedWallet.isAdmin(userAddress))) {
         dispatch({
           type: "ADD_ERROR",
           payload: "You seem to be not an admin for this wallet!",

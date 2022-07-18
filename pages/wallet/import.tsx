@@ -3,6 +3,7 @@ import Input from "../../components/UI/Input";
 import { useContext } from "react";
 import { WalletContext } from "../../state/context/walletContextProvider";
 import { Formik } from "formik";
+import { ethers } from "ethers";
 
 const ImportMultiSigWallet = () => {
   const walletContext = useContext(WalletContext);
@@ -12,15 +13,23 @@ const ImportMultiSigWallet = () => {
       <div className="mt-10 flex flex-col justify-center items-center">
         <Formik
           initialValues={{ address: "" }}
-          validate={(values) => {
+          validate={({ address }) => {
             const errors = {} as any;
-            if (!values.address) {
+            if (!address) {
               errors.address = "Required";
+            } else if (!ethers.utils.isAddress(address)) {
+              errors.address = "Not a valid address";
             }
             return errors;
           }}
-          onSubmit={({ address }, { resetForm }) => {
+          validateOnChange={false}
+          onSubmit={(
+            { address },
+
+            { setSubmitting, resetForm }
+          ) => {
             walletContext.importMultiSigWalletContract(address);
+            setSubmitting(false);
             resetForm();
           }}
         >
@@ -31,6 +40,7 @@ const ImportMultiSigWallet = () => {
             handleChange,
             handleBlur,
             handleSubmit,
+            isValid,
           }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Input
@@ -43,7 +53,9 @@ const ImportMultiSigWallet = () => {
                 placeholder="0x123"
               />
               {errors.address && touched.address && errors.address}
-              <Button type="submit">Import</Button>
+              <Button type="submit" disabled={!isValid}>
+                Import
+              </Button>
             </form>
           )}
         </Formik>

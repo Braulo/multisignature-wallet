@@ -61,7 +61,7 @@ const CreateMultisigWallet = () => {
             handleChange,
             handleBlur,
             handleSubmit,
-            isSubmitting,
+            isValid,
           }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <textarea
@@ -83,7 +83,7 @@ const CreateMultisigWallet = () => {
                 placeholder="2"
               />
               {errors.required && touched.required && errors.required}
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={!isValid}>
                 Create
               </Button>
             </form>
