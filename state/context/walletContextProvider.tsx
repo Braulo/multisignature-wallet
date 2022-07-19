@@ -1,6 +1,5 @@
 import {
   createContext,
-  Dispatch,
   FC,
   PropsWithChildren,
   useContext,
@@ -11,19 +10,8 @@ import { Contract, ethers } from "ethers";
 import walletContractArtifact from "../../artifacts/contracts/MultiSigWallet.sol/MultiSigWallet.json";
 import { Web3Context } from "../context/web3ContextProvider";
 import { MultiSigWallet } from "../../typechain/MultiSigWallet";
-import { TransactionRequest } from "../../Models/TransactionRequestEther";
-
-export const WalletContext = createContext({
-  walletContractsAddresses: [""],
-  loading: false,
-  selectedWallet: {} as Contract & MultiSigWallet,
-  importMultiSigWalletContract: (address: string) => Promise.resolve(),
-  createNewWallet: (admins: string[], required: number) => Promise.resolve(""),
-  setSelectedWallet: (address: string) => {},
-  selectedWalletBalance: "",
-  dispatchContext: {} as Dispatch<{ type: string; payload: any }>,
-  transactionRequests: {} as TransactionRequest[],
-});
+import { TransactionRequest } from "../../models/TransactionRequestEther";
+import { useAdmins } from "../../hooks/useAdmins";
 
 interface IInitialReducerWalletState {
   walletContractsAddresses: string[];
@@ -79,24 +67,20 @@ const walletReducer = (
         selectedWallet: action.payload,
       };
     case "SET_WALLET_BALANCE":
-      console.log(
-        "action payload",
-        state.selectedWalletBalance,
-        action.payload
-      );
-
       return { ...state, selectedWalletBalance: action.payload };
-    case "SET_TXREQUESTSETHER":
+    case "SET_TXREQUESTS":
       return { ...state, transactionRequests: action.payload };
     default:
       return state;
   }
 };
 
-export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
+const useWallet = () => {
   const [state, dispatch] = useReducer(walletReducer, initialState);
 
-  const web3Context = useContext(Web3Context);
+  const { provider } = useContext(Web3Context);
+
+  const { getAllAdminsForWallet } = useAdmins();
 
   useEffect(() => {
     const contractString = localStorage.getItem("wallets");
@@ -112,14 +96,65 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
     dispatch({ type: "ADD_WALLET", payload: address });
   };
 
-  const setSelectedWallet = (address: string) => {
+  const setSelectedWallet = async (address: string) => {
     const walletContract = new ethers.Contract(
       address,
       walletContractArtifact.abi,
-      web3Context.provider?.getSigner()
-    );
+      provider.getSigner()
+    ) as Contract & MultiSigWallet;
 
     dispatch({ type: "SET_SELECTEDWALLET", payload: walletContract });
+
+    await getAllTransactions(walletContract);
+    await getAllAdminsForWallet(walletContract);
+    await getWalletValue(walletContract.address);
+  };
+
+  const getWalletValue = async (address: string) => {
+    const value = await provider.getBalance(address);
+
+    dispatch({
+      type: "SET_WALLET_BALANCE",
+      payload: ethers.utils.formatEther(value.toString()),
+    });
+  };
+
+  const depositEther = async (value: string) => {
+    try {
+      const tx = await state.selectedWallet.depositToWallet({
+        value: ethers.utils.parseEther(value),
+      });
+      await tx.wait();
+
+      await getWalletValue(state.selectedWallet.address);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAllTransactions = async (wallet: Contract & MultiSigWallet) => {
+    try {
+      const transactions = await wallet.getAllTransactions();
+      dispatch({ type: "SET_TXREQUESTS", payload: transactions });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const createTransactionRequestEther = async (
+    to: string,
+    value: string,
+    data: []
+  ) => {
+    const tx = await state.selectedWallet.createTransactionRequest(
+      to,
+      ethers.utils.parseEther(value),
+      data
+    );
+
+    await tx.wait();
+
+    await getAllTransactions(state.selectedWallet);
   };
 
   const createNewWallet = async (admins: string[], required: number) => {
@@ -128,7 +163,7 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
       const walletContract = new ethers.ContractFactory(
         walletContractArtifact.abi,
         walletContractArtifact.bytecode,
-        web3Context.provider?.getSigner()
+        provider?.getSigner()
       );
 
       const contract = await walletContract.deploy(admins, required);
@@ -143,23 +178,25 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
     }
   };
 
+  return {
+    createNewWallet,
+    createTransactionRequestEther,
+    setSelectedWallet,
+    importMultiSigWalletContract,
+    depositEther,
+    getWalletValue,
+    state,
+  };
+};
+
+export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
   return (
     <>
-      <WalletContext.Provider
-        value={{
-          walletContractsAddresses: state.walletContractsAddresses,
-          loading: state.loading,
-          selectedWallet: state.selectedWallet,
-          importMultiSigWalletContract,
-          createNewWallet,
-          setSelectedWallet,
-          selectedWalletBalance: state.selectedWalletBalance,
-          dispatchContext: dispatch,
-          transactionRequests: state.transactionRequests,
-        }}
-      >
+      <WalletContext.Provider value={useWallet()}>
         {props.children}
       </WalletContext.Provider>
     </>
   );
 };
+
+export const WalletContext = createContext({} as ReturnType<typeof useWallet>);

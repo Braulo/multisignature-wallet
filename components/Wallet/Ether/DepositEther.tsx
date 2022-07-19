@@ -1,10 +1,11 @@
 import { Formik } from "formik";
-import { useSelectedWallet } from "../../hooks/useSelectedWallet";
-import Button from "../UI/Button";
-import Input from "../UI/Input";
+import { useContext } from "react";
+import { WalletContext } from "../../../state/context/walletContextProvider";
+import Button from "../../UI/Button";
+import Input from "../../UI/Input";
 
-const Deposit = () => {
-  const { depositEther } = useSelectedWallet();
+const DepositEther = () => {
+  const { depositEther } = useContext(WalletContext);
 
   return (
     <>
@@ -58,4 +59,4 @@ const Deposit = () => {
   );
 };
 
-export default Deposit;
+export default DepositEther;

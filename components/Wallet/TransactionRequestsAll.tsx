@@ -1,26 +1,20 @@
-import { useContext, useEffect } from "react";
-import { useSelectedWallet } from "../../hooks/useSelectedWallet";
+import { useContext } from "react";
 import { formatAddress } from "../../utils/format-address";
 import { ethers } from "ethers";
 import { WalletContext } from "../../state/context/walletContextProvider";
 import Button from "../UI/Button";
 
-const TransactionRequestsEther = () => {
-  const { getAllTransactions } = useSelectedWallet();
-  const { transactionRequests } = useContext(WalletContext);
-
-  useEffect(() => {
-    getAllTransactions();
-  }, []);
+const TransactionRequestsAll = () => {
+  const { state } = useContext(WalletContext);
 
   return (
     <>
-      <h1>Requests:</h1>
+      <h1 className="text-2xl font-bold">Transactions/ Requests:</h1>
       <ul>
-        {transactionRequests?.map((request) => (
+        {state.transactionRequests?.map((request) => (
           <li
             key={request.to}
-            className="dark:bg-dark-secondary bg-light-secondary m-4 rounded p-4"
+            className="dark:bg-dark-secondary bg-light-secondary m-4 rounded p-4 w-96"
           >
             <h1>Requester: {formatAddress(request.requester)}</h1>
             <h1>To: {formatAddress(request.to)}</h1>
@@ -36,4 +30,4 @@ const TransactionRequestsEther = () => {
   );
 };
 
-export default TransactionRequestsEther;
+export default TransactionRequestsAll;

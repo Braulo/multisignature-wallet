@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../state/store";
 import TokenTypeMenu from "./TokenTypeMenu";
-import CreateTransactionRequestEthers from "./CreateTransactionRequestEthers";
-import CreateTransactionRequestERC20 from "./CreateTransactionRequestERC20";
-import CreateTransactionRequestERC721 from "./CreateTransactionRequestERC721";
-import Deposit from "./Deposit";
+import CreateTransactionRequestEthers from "./Ether/CreateTransactionRequestEthers";
+import CreateTransactionRequestERC20 from "./ERC20/CreateTransactionRequestERC20";
+import CreateTransactionRequestERC721 from "./ERC721/CreateTransactionRequestERC721";
+import DepositEther from "./Ether/DepositEther";
 import { useContext } from "react";
 import { WalletContext } from "../../state/context/walletContextProvider";
 
@@ -13,15 +13,15 @@ const TokenType = () => {
     (state: RootState) => state.appReducer.tokenTypeSelected
   );
 
-  const { selectedWalletBalance } = useContext(WalletContext);
+  const { state } = useContext(WalletContext);
 
   return (
-    <>
+    <div className="mb-10">
       <TokenTypeMenu />
       {selectedTransactionRequestOption == "Ether" && (
         <>
-          <h1 className="mt-5">Balance: {selectedWalletBalance} ETH</h1>
-          <Deposit />
+          <h1 className="mt-5">Balance: {state.selectedWalletBalance} ETH</h1>
+          <DepositEther />
           <CreateTransactionRequestEthers />
         </>
       )}
@@ -31,7 +31,7 @@ const TokenType = () => {
       {selectedTransactionRequestOption == "ERC721" && (
         <CreateTransactionRequestERC721 />
       )}
-    </>
+    </div>
   );
 };
 

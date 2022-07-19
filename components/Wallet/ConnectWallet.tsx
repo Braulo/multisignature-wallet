@@ -9,7 +9,7 @@ const ConnectWallet = () => {
   const [userAddressFormatted, setUserAddressFormatted] = useState("");
 
   useEffect(() => {
-    automaticWalletConnect().catch();
+    automaticWalletConnect();
   }, []);
 
   useEffect(() => {

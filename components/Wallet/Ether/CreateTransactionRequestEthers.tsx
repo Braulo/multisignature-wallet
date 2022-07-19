@@ -1,11 +1,12 @@
 import { Formik } from "formik";
 import { ethers } from "ethers";
-import Input from "../UI/Input";
-import Button from "../UI/Button";
-import { useSelectedWallet } from "../../hooks/useSelectedWallet";
+import Input from "../../UI/Input";
+import Button from "../../UI/Button";
+import { useContext } from "react";
+import { WalletContext } from "../../../state/context/walletContextProvider";
 
 const CreateTransactionRequestEthers = () => {
-  const { createTransactionRequestEther } = useSelectedWallet();
+  const { createTransactionRequestEther } = useContext(WalletContext);
 
   return (
     <>
