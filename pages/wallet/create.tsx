@@ -6,7 +6,10 @@ import { WalletContext } from "../../state/context/walletContextProvider";
 import { ethers } from "ethers";
 
 const CreateMultisigWallet = () => {
-  const { createNewWallet, loading } = useContext(WalletContext);
+  const {
+    createNewWallet,
+    state: { loading },
+  } = useContext(WalletContext);
   const [message, setMessage] = useState("");
 
   return (

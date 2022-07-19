@@ -14,7 +14,9 @@ const Wallet = () => {
 
   const { state, setSelectedWallet } = useContext(WalletContext);
 
-  const { provider, userAddress } = useContext(Web3Context);
+  const {
+    state: { provider, userAddress },
+  } = useContext(Web3Context);
 
   const [validWallet, setIsValidWallet] = useState(false);
 

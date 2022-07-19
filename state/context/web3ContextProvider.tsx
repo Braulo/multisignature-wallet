@@ -11,13 +11,6 @@ const initialState: IInitialReducerWeb3State = {
   userAddress: "",
 };
 
-export const Web3Context = createContext({
-  provider: {} as ethers.providers.Web3Provider,
-  connectWallet: () => {},
-  userAddress: "",
-  automaticWalletConnect: () => Promise.resolve(),
-});
-
 const web3Reducer = (
   state = initialState,
   action: { type: string; payload: any }
@@ -38,7 +31,7 @@ const getProvider = () => {
   return new ethers.providers.Web3Provider((window as any).ethereum, "any");
 };
 
-export const Web3ContextProvider: FC<PropsWithChildren> = (props) => {
+const useWeb3 = () => {
   const [state, dispatch] = useReducer(web3Reducer, initialState);
 
   const setUser = (
@@ -93,18 +86,21 @@ export const Web3ContextProvider: FC<PropsWithChildren> = (props) => {
     }
   };
 
+  return {
+    connectWallet,
+    automaticWalletConnect,
+    state,
+  };
+};
+
+export const Web3ContextProvider: FC<PropsWithChildren> = (props) => {
   return (
     <>
-      <Web3Context.Provider
-        value={{
-          provider: state.provider,
-          connectWallet,
-          userAddress: state.userAddress,
-          automaticWalletConnect,
-        }}
-      >
+      <Web3Context.Provider value={useWeb3()}>
         {props.children}
       </Web3Context.Provider>
     </>
   );
 };
+
+export const Web3Context = createContext({} as ReturnType<typeof useWeb3>);

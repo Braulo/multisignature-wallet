@@ -13,14 +13,16 @@ const TokenType = () => {
     (state: RootState) => state.appReducer.tokenTypeSelected
   );
 
-  const { state } = useContext(WalletContext);
+  const {
+    state: { selectedWalletBalance },
+  } = useContext(WalletContext);
 
   return (
     <div className="mb-10">
       <TokenTypeMenu />
       {selectedTransactionRequestOption == "Ether" && (
         <>
-          <h1 className="mt-5">Balance: {state.selectedWalletBalance} ETH</h1>
+          <h1 className="mt-5">Balance: {selectedWalletBalance} ETH</h1>
           <DepositEther />
           <CreateTransactionRequestEthers />
         </>

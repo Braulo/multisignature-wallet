@@ -4,8 +4,11 @@ import { Web3Context } from "../../state/context/web3ContextProvider";
 import { formatAddress } from "../../utils/format-address";
 
 const ConnectWallet = () => {
-  const { userAddress, connectWallet, automaticWalletConnect } =
-    useContext(Web3Context);
+  const {
+    state: { userAddress },
+    connectWallet,
+    automaticWalletConnect,
+  } = useContext(Web3Context);
   const [userAddressFormatted, setUserAddressFormatted] = useState("");
 
   useEffect(() => {

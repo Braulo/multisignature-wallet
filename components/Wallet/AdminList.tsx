@@ -5,14 +5,19 @@ import { Web3Context } from "../../state/context/web3ContextProvider";
 
 const AdminList = () => {
   const { stateAdmins, getAllAdminsForWallet } = useAdmins();
-  const { state } = useContext(WalletContext);
-  const { userAddress, provider } = useContext(Web3Context);
+  const {
+    state: { selectedWallet },
+  } = useContext(WalletContext);
+
+  const {
+    state: { userAddress, provider },
+  } = useContext(Web3Context);
 
   useEffect(() => {
-    if (state.selectedWallet.address) {
-      getAllAdminsForWallet(state.selectedWallet);
+    if (selectedWallet.address) {
+      getAllAdminsForWallet(selectedWallet);
     }
-  }, [state.selectedWallet.address, userAddress, provider]);
+  }, [selectedWallet.address, userAddress, provider]);
 
   return (
     <>

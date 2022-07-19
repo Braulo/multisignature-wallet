@@ -78,7 +78,9 @@ const walletReducer = (
 const useWallet = () => {
   const [state, dispatch] = useReducer(walletReducer, initialState);
 
-  const { provider } = useContext(Web3Context);
+  const {
+    state: { provider },
+  } = useContext(Web3Context);
 
   const { getAllAdminsForWallet } = useAdmins();
 

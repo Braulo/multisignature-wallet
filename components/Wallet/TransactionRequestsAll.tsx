@@ -5,13 +5,15 @@ import { WalletContext } from "../../state/context/walletContextProvider";
 import Button from "../UI/Button";
 
 const TransactionRequestsAll = () => {
-  const { state } = useContext(WalletContext);
+  const {
+    state: { transactionRequests },
+  } = useContext(WalletContext);
 
   return (
     <>
       <h1 className="text-2xl font-bold">Transactions/ Requests:</h1>
       <ul>
-        {state.transactionRequests?.map((request) => (
+        {transactionRequests?.map((request) => (
           <li
             key={request.to}
             className="dark:bg-dark-secondary bg-light-secondary m-4 rounded p-4 w-96"

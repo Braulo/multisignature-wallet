@@ -33,7 +33,9 @@ const walletReducer = (
   }
 };
 export const useAdmins = () => {
-  const { userAddress } = useContext(Web3Context);
+  const {
+    state: { userAddress },
+  } = useContext(Web3Context);
   const { state } = useContext(WalletContext);
 
   const [stateAdmins, dispatch] = useReducer(walletReducer, initialState);
