@@ -20,7 +20,7 @@ const TokenType = () => {
       <TokenTypeMenu />
       {selectedTransactionRequestOption == "Ether" && (
         <>
-          <h1>Blance: {selectedWalletBalance} ETH</h1>
+          <h1 className="mt-5">Balance: {selectedWalletBalance} ETH</h1>
           <Deposit />
           <CreateTransactionRequestEthers />
         </>

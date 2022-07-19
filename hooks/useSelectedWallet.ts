@@ -2,14 +2,17 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import { WalletContext } from "../state/context/walletContextProvider";
 import { Web3Context } from "../state/context/web3ContextProvider";
 import { ethers } from "ethers";
+import { TransactionRequest } from "../Models/TransactionRequestEther";
 
 interface IInitialReducerWalletState {
   admins: string[];
   error: string;
+  transactionRequests: TransactionRequest[];
 }
 const initialState: IInitialReducerWalletState = {
   admins: [],
   error: "",
+  transactionRequests: [],
 };
 
 const walletReducer = (
@@ -31,6 +34,7 @@ const walletReducer = (
 export const useSelectedWallet = (address?: string) => {
   const { setSelectedWallet, selectedWallet, dispatchContext } =
     useContext(WalletContext);
+
   const [validWallet, setIsValidWallet] = useState(false);
   const { provider, userAddress } = useContext(Web3Context);
 
@@ -97,17 +101,25 @@ export const useSelectedWallet = (address?: string) => {
     }
   };
 
+  const getAllTransactions = async () => {
+    const transactions = await selectedWallet.getAllTransactions();
+    dispatchContext({ type: "SET_TXREQUESTSETHER", payload: transactions });
+  };
+
   const createTransactionRequestEther = async (
     to: string,
     value: string,
     data: []
   ) => {
-    const test = await selectedWallet.createTransactionRequest(
+    const tx = await selectedWallet.createTransactionRequest(
       to,
       ethers.utils.parseEther(value),
       data
     );
-    console.log("test", test);
+
+    await tx.wait();
+
+    await getAllTransactions();
   };
 
   return {
@@ -115,5 +127,6 @@ export const useSelectedWallet = (address?: string) => {
     selectedWalletState: state,
     createTransactionRequestEther,
     depositEther,
+    getAllTransactions,
   };
 };

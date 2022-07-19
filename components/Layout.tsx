@@ -12,7 +12,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     <div className="flex flex-col text-black dark:text-white bg-white dark:bg-black h-screen break-all">
       <Navbar />
       {showSidenav && <Sidenav />}
-      <main className="grow">{children}</main>
+      <main className="grow bg-white dark:bg-black">{children}</main>
     </div>
   );
 };

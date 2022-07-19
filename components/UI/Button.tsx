@@ -19,7 +19,8 @@ const Button: FC<PropsWithChildren & IButton> = ({
       <button
         className={`bg-primary font-bold py-2 px-4 rounded text-white ${
           className || ""
-        } ${disabled ? "bg-gray-600" : ""}`}
+        } ${disabled ? "bg-gray-600" : ""} 
+        `}
         onClick={onClick}
         disabled={disabled}
         type={type}

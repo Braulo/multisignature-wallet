@@ -4,6 +4,7 @@ import TokenType from "../../../components/Wallet/TokenType";
 import { useSelectedWallet } from "../../../hooks/useSelectedWallet";
 import { WalletContext } from "../../../state/context/walletContextProvider";
 import { formatAddress } from "../../../utils/format-address";
+import TransactionRequests from "../../../components/Wallet/TransactionRequestsEther";
 
 const Wallet = () => {
   const router = useRouter();
@@ -14,10 +15,14 @@ const Wallet = () => {
 
   return validWallet ? (
     <>
-      <div className="flex flex-col justify-center items-center mt-10">
+      <div className="flex flex-col justify-center items-center mt-5">
         <h1 className="text-2xl">
           Wallet: {formatAddress(address)} {selectedWalletBalance} ETH
         </h1>
+
+        <h1 className="mt-5 mb-2 text-2xl">Select a Token</h1>
+        <TokenType />
+        <h1>{selectedWalletState.error}</h1>
         <h1>Admins for this wallet:</h1>
         <ul>
           {selectedWalletState.admins.map((admin) => (
@@ -29,10 +34,8 @@ const Wallet = () => {
             </li>
           ))}
         </ul>
-
-        <h1 className="mt-10 mb-2 text-2xl">Select a Token</h1>
-        <TokenType />
-        <h1>{selectedWalletState.error}</h1>
+        <h1>All Transaction requests:</h1>
+        <TransactionRequests />
       </div>
     </>
   ) : (

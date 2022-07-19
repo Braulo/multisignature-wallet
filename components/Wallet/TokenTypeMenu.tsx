@@ -1,6 +1,7 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "../UI/Button";
 import { changeTokenType } from "../../state/store/app/app.store";
+import { RootState } from "../../state/store";
 
 const TokenTypeOptions = [
   { name: "Ether" },
@@ -9,6 +10,9 @@ const TokenTypeOptions = [
 ];
 
 const TokenTypeMenu = () => {
+  const selectedTransactionRequestOption = useSelector(
+    (state: RootState) => state.appReducer.tokenTypeSelected
+  );
   const dispatch = useDispatch();
 
   const menuButtonClickHandler = (optionName: string) => {
@@ -25,6 +29,13 @@ const TokenTypeMenu = () => {
               onClick={() => {
                 menuButtonClickHandler(option.name);
               }}
+              className={`
+          ${
+            selectedTransactionRequestOption === option.name
+              ? "bg-primary"
+              : "!bg-light-secondary dark:!bg-dark-secondary"
+          }
+              `}
             >
               {option.name}
             </Button>

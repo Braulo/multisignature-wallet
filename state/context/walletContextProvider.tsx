@@ -11,6 +11,7 @@ import { Contract, ethers } from "ethers";
 import walletContractArtifact from "../../artifacts/contracts/MultiSigWallet.sol/MultiSigWallet.json";
 import { Web3Context } from "../context/web3ContextProvider";
 import { MultiSigWallet } from "../../typechain/MultiSigWallet";
+import { TransactionRequest } from "../../Models/TransactionRequestEther";
 
 export const WalletContext = createContext({
   walletContractsAddresses: [""],
@@ -21,6 +22,7 @@ export const WalletContext = createContext({
   setSelectedWallet: (address: string) => {},
   selectedWalletBalance: "",
   dispatchContext: {} as Dispatch<{ type: string; payload: any }>,
+  transactionRequests: {} as TransactionRequest[],
 });
 
 interface IInitialReducerWalletState {
@@ -28,12 +30,14 @@ interface IInitialReducerWalletState {
   loading: boolean;
   selectedWallet: Contract & MultiSigWallet;
   selectedWalletBalance: string;
+  transactionRequests: TransactionRequest[];
 }
 const initialState: IInitialReducerWalletState = {
   walletContractsAddresses: [],
   loading: false,
   selectedWallet: {} as Contract & MultiSigWallet,
   selectedWalletBalance: "",
+  transactionRequests: [],
 };
 
 const walletReducer = (
@@ -82,6 +86,8 @@ const walletReducer = (
       );
 
       return { ...state, selectedWalletBalance: action.payload };
+    case "SET_TXREQUESTSETHER":
+      return { ...state, transactionRequests: action.payload };
     default:
       return state;
   }
@@ -149,6 +155,7 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
           setSelectedWallet,
           selectedWalletBalance: state.selectedWalletBalance,
           dispatchContext: dispatch,
+          transactionRequests: state.transactionRequests,
         }}
       >
         {props.children}

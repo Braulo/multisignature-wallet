@@ -28,7 +28,7 @@ const CreateTransactionRequestEthers = () => {
         }}
         validateOnChange={true}
         onSubmit={async ({ to, value }, { setSubmitting, resetForm }) => {
-          const lol = await createTransactionRequestEther(to, value, []);
+          await createTransactionRequestEther(to, value.toString(), []);
 
           setSubmitting(false);
           resetForm();

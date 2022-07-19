@@ -37,7 +37,7 @@ const Deposit = () => {
           handleSubmit,
           isValid,
         }) => (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
               type="number"
               name="value"
