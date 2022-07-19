@@ -4,10 +4,10 @@ interface IInput {
   name: string;
   labelName?: string;
   placeholder?: string;
-  onChange: (event) => void;
-  value: string;
+  onChange?: (event) => void;
+  value?: string;
   type: string;
-  onBlur: (event) => void;
+  onBlur?: (event) => void;
 }
 
 const Input: FC<IInput> = (props) => {

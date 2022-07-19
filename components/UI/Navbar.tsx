@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect } from "react";
 import Link from "next/link";
 import ThemeToggle from "../UI/ThemeToggle";
-import ConnectWallet from "../ConnectWallet";
+import ConnectWallet from "../Wallet/ConnectWallet";
 import { useDispatch } from "react-redux";
 import { toggleShowSidenav } from "../../state/store/app/app.store";
 import { AiOutlineMenu } from "react-icons/ai";

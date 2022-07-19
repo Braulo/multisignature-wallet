@@ -1,7 +1,7 @@
-import Button from "./UI/Button";
+import Button from "../UI/Button";
 import { useContext, useEffect, useState } from "react";
-import { Web3Context } from "../state/context/web3ContextProvider";
-import { formatAddress } from "../utils/format-address";
+import { Web3Context } from "../../state/context/web3ContextProvider";
+import { formatAddress } from "../../utils/format-address";
 
 const ConnectWallet = () => {
   const { userAddress, connectWallet, automaticWalletConnect } =

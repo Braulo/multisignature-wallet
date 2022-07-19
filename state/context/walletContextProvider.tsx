@@ -1,5 +1,6 @@
 import {
   createContext,
+  Dispatch,
   FC,
   PropsWithChildren,
   useContext,
@@ -18,17 +19,21 @@ export const WalletContext = createContext({
   importMultiSigWalletContract: (address: string) => Promise.resolve(),
   createNewWallet: (admins: string[], required: number) => Promise.resolve(""),
   setSelectedWallet: (address: string) => {},
+  selectedWalletBalance: "",
+  dispatchContext: {} as Dispatch<{ type: string; payload: any }>,
 });
 
 interface IInitialReducerWalletState {
   walletContractsAddresses: string[];
   loading: boolean;
   selectedWallet: Contract & MultiSigWallet;
+  selectedWalletBalance: string;
 }
 const initialState: IInitialReducerWalletState = {
   walletContractsAddresses: [],
   loading: false,
   selectedWallet: {} as Contract & MultiSigWallet,
+  selectedWalletBalance: "",
 };
 
 const walletReducer = (
@@ -69,6 +74,14 @@ const walletReducer = (
         ...state,
         selectedWallet: action.payload,
       };
+    case "SET_WALLET_BALANCE":
+      console.log(
+        "action payload",
+        state.selectedWalletBalance,
+        action.payload
+      );
+
+      return { ...state, selectedWalletBalance: action.payload };
     default:
       return state;
   }
@@ -134,6 +147,8 @@ export const WalletContextProvider: FC<PropsWithChildren> = (props) => {
           importMultiSigWalletContract,
           createNewWallet,
           setSelectedWallet,
+          selectedWalletBalance: state.selectedWalletBalance,
+          dispatchContext: dispatch,
         }}
       >
         {props.children}

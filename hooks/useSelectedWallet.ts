@@ -28,8 +28,9 @@ const walletReducer = (
       return state;
   }
 };
-export const useSelectedWallet = (address: string) => {
-  const { setSelectedWallet, selectedWallet } = useContext(WalletContext);
+export const useSelectedWallet = (address?: string) => {
+  const { setSelectedWallet, selectedWallet, dispatchContext } =
+    useContext(WalletContext);
   const [validWallet, setIsValidWallet] = useState(false);
   const { provider, userAddress } = useContext(Web3Context);
 
@@ -40,7 +41,7 @@ export const useSelectedWallet = (address: string) => {
       const validContract = ethers.utils.isAddress(address);
       setIsValidWallet(validContract);
 
-      if (validContract && provider) {
+      if (validContract && provider && provider.getSigner()) {
         setSelectedWallet(address);
       }
     }
@@ -49,8 +50,31 @@ export const useSelectedWallet = (address: string) => {
   useEffect(() => {
     if (provider && selectedWallet.address) {
       getAllAdminsForSelectedWallet();
+      getWalletValue();
     }
   }, [provider, address, selectedWallet.address]);
+
+  const getWalletValue = async () => {
+    const value = await provider.getBalance(selectedWallet.address);
+
+    dispatchContext({
+      type: "SET_WALLET_BALANCE",
+      payload: ethers.utils.formatEther(value.toString()),
+    });
+  };
+
+  const depositEther = async (value: string) => {
+    try {
+      const tx = await selectedWallet.depositToWallet({
+        value: ethers.utils.parseEther(value),
+      });
+      await tx.wait();
+
+      await getWalletValue();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getAllAdminsForSelectedWallet = async () => {
     try {
@@ -65,6 +89,7 @@ export const useSelectedWallet = (address: string) => {
         });
       }
     } catch (error) {
+      dispatch({ type: "ADD_ADMINS", payload: [] });
       dispatch({
         type: "ADD_ERROR",
         payload: "this wallet does not exist",
@@ -72,8 +97,23 @@ export const useSelectedWallet = (address: string) => {
     }
   };
 
+  const createTransactionRequestEther = async (
+    to: string,
+    value: string,
+    data: []
+  ) => {
+    const test = await selectedWallet.createTransactionRequest(
+      to,
+      ethers.utils.parseEther(value),
+      data
+    );
+    console.log("test", test);
+  };
+
   return {
     validWallet,
     selectedWalletState: state,
+    createTransactionRequestEther,
+    depositEther,
   };
 };

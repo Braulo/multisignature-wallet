@@ -2,10 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface InitialAppStoreState {
   showSidenav: boolean;
+  tokenTypeSelected: string;
 }
 
 const initialState: InitialAppStoreState = {
   showSidenav: false,
+  tokenTypeSelected: "Ether",
 };
 
 const appSlice = createSlice({
@@ -15,9 +17,12 @@ const appSlice = createSlice({
     toggleShowSidenav(state) {
       state.showSidenav = !state.showSidenav;
     },
+    changeTokenType(state, { payload }) {
+      state.tokenTypeSelected = payload;
+    },
   },
 });
 
-export const { toggleShowSidenav } = appSlice.actions;
+export const { toggleShowSidenav, changeTokenType } = appSlice.actions;
 
 export default appSlice.reducer;
