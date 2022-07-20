@@ -103,9 +103,19 @@ export const useWallet = () => {
   const getAllTransactions = async (wallet: Contract & MultiSigWallet) => {
     try {
       const transactions = await wallet.getAllTransactions();
-      console.log(transactions);
 
-      dispatch({ type: "SET_TXREQUESTS", payload: transactions });
+      const withApprovedCount = await Promise.all(
+        transactions.map(async (tx) => {
+          const count = await wallet.getApprovalCountFromTransaction(tx.id);
+          return {
+            ...tx,
+            approved: count.toString(),
+            required: (await wallet.required()).toString(),
+          };
+        })
+      );
+
+      dispatch({ type: "SET_TXREQUESTS", payload: withApprovedCount });
     } catch (error) {
       console.log(error);
     }

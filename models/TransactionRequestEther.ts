@@ -9,4 +9,6 @@ export interface TransactionRequest {
   requester: string;
   to: string;
   value: BigNumber;
+  approved: string;
+  required: string;
 }

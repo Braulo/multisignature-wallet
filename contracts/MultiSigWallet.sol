@@ -67,7 +67,7 @@ contract MultiSigWallet is IERC721Receiver {
 
     Transaction[] public transactions;
     address[] public admins;
-    uint256 required;
+    uint256 public required;
 
     /// @param _admins addresses that can sign / approve / request / execute a transaction
     /// @param _required how many admins have to approve a transaction before it can be executed
@@ -248,7 +248,7 @@ contract MultiSigWallet is IERC721Receiver {
     }
 
     function getApprovalCountFromTransaction(uint256 _transactionId)
-        private
+        public
         view
         returns (uint256 count)
     {
