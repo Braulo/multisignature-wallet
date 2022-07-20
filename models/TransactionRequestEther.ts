@@ -1,6 +1,7 @@
 import { BigNumber } from "ethers";
 
 export interface TransactionRequest {
+  id: BigNumber;
   data: string;
   erc20Token: string;
   erc721Token: string;

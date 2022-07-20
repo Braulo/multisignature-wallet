@@ -6,6 +6,8 @@ import Button from "../UI/Button";
 
 const TransactionRequestsAll = () => {
   const {
+    approveTransactionRequest,
+    executeTransactionRequest,
     state: { transactionRequests },
   } = useContext(WalletContext);
 
@@ -24,7 +26,22 @@ const TransactionRequestsAll = () => {
               Value: {ethers.utils.formatEther(request.value.toString())} ETH
             </h1>
             <h1>Executed: {request.executed.toString()}</h1>
-            {!request.executed && <Button>Approve</Button>}
+            <Button
+              onClick={async () => {
+                await approveTransactionRequest(request.id.toString());
+              }}
+            >
+              Approve
+            </Button>
+            {!request.executed && (
+              <Button
+                onClick={async () => {
+                  await executeTransactionRequest(request.id.toString());
+                }}
+              >
+                Execute
+              </Button>
+            )}
           </li>
         ))}
       </ul>

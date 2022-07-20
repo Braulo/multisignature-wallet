@@ -12,7 +12,7 @@ const Wallet = () => {
   const router = useRouter();
   const address = router.query["address"] as string;
 
-  const { state, setSelectedWallet } = useContext(WalletContext);
+  const { setSelectedWallet } = useContext(WalletContext);
 
   const {
     state: { provider, userAddress },
@@ -33,9 +33,7 @@ const Wallet = () => {
   return validWallet ? (
     <>
       <div className="flex flex-col justify-center items-center mt-5">
-        <h1 className="text-2xl">
-          Wallet: {formatAddress(address)} {state.selectedWalletBalance} ETH
-        </h1>
+        <h1 className="text-2xl">Wallet: {formatAddress(address)}</h1>
         <AdminList />
         <TransactionRequests />
 

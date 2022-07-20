@@ -1,14 +1,14 @@
 import { Formik } from "formik";
-import { useContext } from "react";
-import { WalletContext } from "../../../state/context/walletContextProvider";
+import { useEtherWallet } from "../../../hooks/useEtherWallet";
 import Button from "../../UI/Button";
 import Input from "../../UI/Input";
 
 const DepositEther = () => {
-  const { depositEther } = useContext(WalletContext);
+  const { etherValue, depositEtherToSelectedWallet } = useEtherWallet();
 
   return (
     <>
+      <h1 className="text-center mt-5">Value: {etherValue} ETH</h1>
       <Formik
         initialValues={{
           value: "",
@@ -23,7 +23,7 @@ const DepositEther = () => {
         }}
         validateOnChange={true}
         onSubmit={async ({ value }, { setSubmitting, resetForm }) => {
-          await depositEther(value.toString());
+          await depositEtherToSelectedWallet(value.toString());
 
           setSubmitting(false);
           resetForm();

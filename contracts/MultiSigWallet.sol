@@ -51,6 +51,7 @@ contract MultiSigWallet is IERC721Receiver {
     event Execute(address indexed executor, uint256 indexed transactionId);
 
     struct Transaction {
+        uint256 id;
         address requester;
         address to;
         uint256 value;
@@ -131,6 +132,7 @@ contract MultiSigWallet is IERC721Receiver {
     ) external adminOnly {
         transactions.push(
             Transaction({
+                id: transactions.length,
                 requester: msg.sender,
                 to: _to,
                 value: _tokenId,
@@ -154,6 +156,7 @@ contract MultiSigWallet is IERC721Receiver {
     ) external adminOnly {
         transactions.push(
             Transaction({
+                id: transactions.length,
                 requester: msg.sender,
                 to: _to,
                 value: _value,
@@ -178,6 +181,7 @@ contract MultiSigWallet is IERC721Receiver {
     ) external adminOnly {
         transactions.push(
             Transaction({
+                id: transactions.length,
                 requester: msg.sender,
                 to: _to,
                 value: _value,

@@ -1,0 +1,170 @@
+import { Contract, ethers } from "ethers";
+import { useContext, useEffect, useReducer } from "react";
+import { TransactionRequest } from "../models/TransactionRequestEther";
+import { Web3Context } from "../state/context/web3ContextProvider";
+import { MultiSigWallet } from "../typechain/MultiSigWallet";
+import { useAdmins } from "./useAdmins";
+import walletContractArtifact from "../artifacts/contracts/MultiSigWallet.sol/MultiSigWallet.json";
+
+interface IInitialReducerWalletState {
+  walletContractsAddresses: string[];
+  loading: boolean;
+  selectedWallet: Contract & MultiSigWallet;
+  transactionRequests: TransactionRequest[];
+}
+const initialState: IInitialReducerWalletState = {
+  walletContractsAddresses: [],
+  loading: false,
+  selectedWallet: {} as Contract & MultiSigWallet,
+  transactionRequests: [],
+};
+
+const walletReducer = (
+  state = initialState,
+  action: {
+    type: string;
+    payload: any;
+  }
+): IInitialReducerWalletState => {
+  switch (action.type) {
+    case "ADD_WALLET":
+      const newState = {
+        ...state,
+        walletContractsAddresses: [
+          ...state.walletContractsAddresses,
+          action.payload,
+        ],
+      };
+
+      localStorage.setItem(
+        "wallets",
+        JSON.stringify(newState.walletContractsAddresses)
+      );
+
+      return newState;
+    case "SET_WALLETS":
+      return {
+        ...state,
+        walletContractsAddresses: action.payload,
+      };
+    case "SET_LOADING":
+      return {
+        ...state,
+        loading: action.payload,
+      } as IInitialReducerWalletState;
+    case "SET_SELECTEDWALLET":
+      return {
+        ...state,
+        selectedWallet: action.payload,
+      };
+    case "SET_TXREQUESTS":
+      return { ...state, transactionRequests: action.payload };
+    default:
+      return state;
+  }
+};
+
+export const useWallet = () => {
+  const [state, dispatch] = useReducer(walletReducer, initialState);
+
+  const {
+    state: { provider },
+  } = useContext(Web3Context);
+
+  const { getAllAdminsForWallet } = useAdmins();
+
+  useEffect(() => {
+    const contractString = localStorage.getItem("wallets");
+
+    if (!contractString) {
+      return;
+    }
+    const contracts = JSON.parse(localStorage.getItem("wallets") || "");
+    dispatch({ type: "SET_WALLETS", payload: contracts });
+  }, []);
+
+  const importMultiSigWalletContract = async (address: string) => {
+    dispatch({ type: "ADD_WALLET", payload: address });
+  };
+
+  const setSelectedWallet = async (address: string) => {
+    const walletContract = new ethers.Contract(
+      address,
+      walletContractArtifact.abi,
+      provider.getSigner()
+    ) as Contract & MultiSigWallet;
+
+    dispatch({ type: "SET_SELECTEDWALLET", payload: walletContract });
+
+    await getAllTransactions(walletContract);
+    await getAllAdminsForWallet(walletContract);
+  };
+
+  const getAllTransactions = async (wallet: Contract & MultiSigWallet) => {
+    try {
+      const transactions = await wallet.getAllTransactions();
+      console.log(transactions);
+
+      dispatch({ type: "SET_TXREQUESTS", payload: transactions });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const createNewWallet = async (admins: string[], required: number) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const walletContract = new ethers.ContractFactory(
+        walletContractArtifact.abi,
+        walletContractArtifact.bytecode,
+        provider?.getSigner()
+      );
+
+      const contract = await walletContract.deploy(admins, required);
+      await contract.deployed();
+      dispatch({ type: "SET_LOADING", payload: false });
+      dispatch({ type: "ADD_WALLET", payload: contract.address });
+      return contract.address;
+    } catch (error) {
+      dispatch({ type: "SET_LOADING", payload: false });
+      console.log(error);
+      return "";
+    }
+  };
+
+  const isDoneSettingSelectedWallet = () => {
+    return Object.keys(state.selectedWallet || {}).length > 1;
+  };
+
+  const approveTransactionRequest = async (id: string) => {
+    try {
+      const tx = await state.selectedWallet.approveTransactionRequest(id);
+      await tx.wait();
+
+      await getAllTransactions(state.selectedWallet);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const executeTransactionRequest = async (id: string) => {
+    try {
+      const tx = await state.selectedWallet.executeTransaction(id);
+      await tx.wait();
+      await getAllTransactions(state.selectedWallet);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return {
+    createNewWallet,
+    setSelectedWallet,
+    importMultiSigWalletContract,
+    isDoneSettingSelectedWallet,
+    getAllTransactions,
+    approveTransactionRequest,
+    executeTransactionRequest,
+    state,
+  };
+};
