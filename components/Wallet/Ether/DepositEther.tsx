@@ -18,7 +18,9 @@ const DepositEther = () => {
         validate={({ value }) => {
           const errors = {} as any;
 
-          if (+value < 0) {
+          if (!value) {
+            errors.value = "Required";
+          } else if (+value < 0) {
             errors.value = "Has to be more than 0";
           }
           return errors;

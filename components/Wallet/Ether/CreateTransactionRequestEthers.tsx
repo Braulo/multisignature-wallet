@@ -23,6 +23,8 @@ const CreateTransactionRequestEthers = () => {
             errors.to = `Address (${to})ist not valid`;
           } else if (+value < 0) {
             errors.value = "Has to be more than 0";
+          } else if (!value) {
+            errors.value = "Required";
           }
           return errors;
         }}

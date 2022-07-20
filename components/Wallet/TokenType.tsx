@@ -5,6 +5,8 @@ import CreateTransactionRequestEthers from "./Ether/CreateTransactionRequestEthe
 import CreateTransactionRequestERC20 from "./ERC20/CreateTransactionRequestERC20";
 import CreateTransactionRequestERC721 from "./ERC721/CreateTransactionRequestERC721";
 import DepositEther from "./Ether/DepositEther";
+import DepositERC721 from "./ERC721/DepositERC721";
+import DepositERC20 from "./ERC20/DepositERC20";
 
 const TokenType = () => {
   const selectedTransactionRequestOption = useSelector(
@@ -21,10 +23,16 @@ const TokenType = () => {
         </>
       )}
       {selectedTransactionRequestOption == "ERC20" && (
-        <CreateTransactionRequestERC20 />
+        <>
+          <CreateTransactionRequestERC20 />
+          <DepositERC20 />
+        </>
       )}
       {selectedTransactionRequestOption == "ERC721" && (
-        <CreateTransactionRequestERC721 />
+        <>
+          <CreateTransactionRequestERC721 />
+          <DepositERC721 />
+        </>
       )}
     </div>
   );
