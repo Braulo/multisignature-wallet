@@ -2,9 +2,11 @@ import { Formik } from "formik";
 import { useEtherWallet } from "../../../hooks/useEtherWallet";
 import Button from "../../UI/Button";
 import Input from "../../UI/Input";
+import Spinner from "../../UI/Spinner";
 
 const DepositEther = () => {
-  const { etherValue, depositEtherToSelectedWallet } = useEtherWallet();
+  const { etherValue, depositEtherToSelectedWallet, showSpinner } =
+    useEtherWallet();
 
   return (
     <>
@@ -49,7 +51,7 @@ const DepositEther = () => {
               placeholder="0.01"
             />
             {errors.value && touched.value && errors.value}
-            <Button type="submit" disabled={!isValid}>
+            <Button type="submit" disabled={!isValid} showSpinner={showSpinner}>
               Deposit
             </Button>
           </form>

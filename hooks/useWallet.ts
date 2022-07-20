@@ -1,5 +1,5 @@
 import { Contract, ethers } from "ethers";
-import { useContext, useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 import { TransactionRequest } from "../models/TransactionRequestEther";
 import { Web3Context } from "../state/context/web3ContextProvider";
 import { MultiSigWallet } from "../typechain/MultiSigWallet";
@@ -73,6 +73,8 @@ export const useWallet = () => {
 
   const { getAllAdminsForWallet } = useAdmins();
 
+  const [showSpinner, setShowSpinner] = useState(false);
+
   useEffect(() => {
     const contractString = localStorage.getItem("wallets");
 
@@ -102,6 +104,7 @@ export const useWallet = () => {
 
   const getAllTransactions = async (wallet: Contract & MultiSigWallet) => {
     try {
+      setShowSpinner(true);
       const transactions = await wallet.getAllTransactions();
 
       const withApprovedCount = await Promise.all(
@@ -118,6 +121,8 @@ export const useWallet = () => {
       dispatch({ type: "SET_TXREQUESTS", payload: withApprovedCount });
     } catch (error) {
       console.log(error);
+    } finally {
+      setShowSpinner(false);
     }
   };
 
@@ -148,22 +153,28 @@ export const useWallet = () => {
 
   const approveTransactionRequest = async (id: string) => {
     try {
+      setShowSpinner(true);
       const tx = await state.selectedWallet.approveTransactionRequest(id);
       await tx.wait();
 
       await getAllTransactions(state.selectedWallet);
     } catch (error) {
       console.log(error);
+    } finally {
+      setShowSpinner(false);
     }
   };
 
   const executeTransactionRequest = async (id: string) => {
     try {
+      setShowSpinner(true);
       const tx = await state.selectedWallet.executeTransaction(id);
       await tx.wait();
       await getAllTransactions(state.selectedWallet);
     } catch (error) {
       console.log(error);
+    } finally {
+      setShowSpinner(false);
     }
   };
 
@@ -175,6 +186,7 @@ export const useWallet = () => {
     getAllTransactions,
     approveTransactionRequest,
     executeTransactionRequest,
+    showSpinner,
     state,
   };
 };

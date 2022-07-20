@@ -34,11 +34,10 @@ const Wallet = () => {
     <>
       <div className="flex flex-col justify-center items-center mt-5">
         <h1 className="text-2xl">Wallet: {formatAddress(address)}</h1>
-        <AdminList />
-        <TransactionRequests />
-
         <h1 className="mt-5 mb-2 text-2xl">Select a Token</h1>
         <TokenType />
+        <AdminList />
+        <TransactionRequests />
       </div>
     </>
   ) : (

@@ -1,10 +1,12 @@
 import { FC, PropsWithChildren } from "react";
+import Spinner from "./Spinner";
 
 interface IButton {
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
   type?: any;
+  showSpinner?: boolean;
 }
 
 const Button: FC<PropsWithChildren & IButton> = ({
@@ -13,11 +15,12 @@ const Button: FC<PropsWithChildren & IButton> = ({
   className,
   disabled,
   type,
+  showSpinner,
 }) => {
   return (
     <>
       <button
-        className={`bg-primary font-bold py-2 px-4 rounded text-white ${
+        className={`flex flex-col justify-center items-center bg-primary font-bold py-2 px-4 rounded text-white ${
           className || ""
         } ${disabled ? "bg-gray-600" : ""} 
         `}
@@ -26,6 +29,7 @@ const Button: FC<PropsWithChildren & IButton> = ({
         type={type}
       >
         {children}
+        {showSpinner && <Spinner />}
       </button>
     </>
   );

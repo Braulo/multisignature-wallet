@@ -11,6 +11,7 @@ export const useEtherWallet = () => {
   } = useContext(WalletContext);
 
   const [etherValue, setEtherValue] = useState("");
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const {
     state: { provider },
@@ -30,6 +31,7 @@ export const useEtherWallet = () => {
 
   const depositEtherToSelectedWallet = async (value: string) => {
     try {
+      setShowSpinner(true);
       const tx = await selectedWallet.depositToWallet({
         value: ethers.utils.parseEther(value),
       });
@@ -38,6 +40,8 @@ export const useEtherWallet = () => {
       await getWalletValueEther(selectedWallet.address);
     } catch (error) {
       console.log(error);
+    } finally {
+      setShowSpinner(false);
     }
   };
 
@@ -46,20 +50,27 @@ export const useEtherWallet = () => {
     value: string,
     data: []
   ) => {
-    const tx = await selectedWallet.createTransactionRequest(
-      to,
-      ethers.utils.parseEther(value),
-      data
-    );
+    try {
+      setShowSpinner(true);
+      const tx = await selectedWallet.createTransactionRequest(
+        to,
+        ethers.utils.parseEther(value),
+        data
+      );
 
-    await tx.wait();
+      await tx.wait();
 
-    await getAllTransactions(selectedWallet);
+      await getAllTransactions(selectedWallet);
+    } catch (error) {
+    } finally {
+      setShowSpinner(false);
+    }
   };
 
   return {
     depositEtherToSelectedWallet,
     createTransactionRequestEther,
     etherValue,
+    showSpinner,
   };
 };

@@ -5,7 +5,7 @@ import Button from "../../UI/Button";
 import { useEtherWallet } from "../../../hooks/useEtherWallet";
 
 const CreateTransactionRequestEthers = () => {
-  const { createTransactionRequestEther } = useEtherWallet();
+  const { createTransactionRequestEther, showSpinner } = useEtherWallet();
 
   return (
     <>
@@ -64,7 +64,7 @@ const CreateTransactionRequestEthers = () => {
               placeholder="0.01"
             />
             {errors.value && touched.value && errors.value}
-            <Button type="submit" disabled={!isValid}>
+            <Button type="submit" disabled={!isValid} showSpinner={showSpinner}>
               Request Transaction
             </Button>
           </form>
