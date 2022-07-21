@@ -28,6 +28,8 @@ const CreateMultisigWallet = () => {
             const errors = {} as any;
             if (!admins) {
               errors.admins = "Required";
+            } else if (!required) {
+              errors.required = "Required";
             } else if (+required < 0) {
               errors.required = "Required must be greater than 0";
             }
@@ -39,7 +41,6 @@ const CreateMultisigWallet = () => {
             });
             return errors;
           }}
-          validateOnChange={false}
           onSubmit={async (
             { admins, required },
             { setSubmitting, resetForm }
@@ -86,13 +87,12 @@ const CreateMultisigWallet = () => {
                 placeholder="2"
               />
               {errors.required && touched.required && errors.required}
-              <Button type="submit" disabled={!isValid}>
+              <Button type="submit" disabled={!isValid} showSpinner={loading}>
                 Create
               </Button>
             </form>
           )}
         </Formik>
-        {loading && <h1>Loading...</h1>}
         {message != "" && <h1>{message}</h1>}
       </div>
     </>

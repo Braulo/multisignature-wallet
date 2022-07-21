@@ -24,14 +24,14 @@ const TokenType = () => {
       )}
       {selectedTransactionRequestOption == "ERC20" && (
         <>
-          <CreateTransactionRequestERC20 />
           <DepositERC20 />
+          <CreateTransactionRequestERC20 />
         </>
       )}
       {selectedTransactionRequestOption == "ERC721" && (
         <>
-          <CreateTransactionRequestERC721 />
           <DepositERC721 />
+          <CreateTransactionRequestERC721 />
         </>
       )}
     </div>
