@@ -19,6 +19,7 @@ const ERC20ABI = [
 
 export const useERC20Wallet = () => {
   const {
+    getAllTransactions,
     state: { selectedWallet },
   } = useContext(WalletContext);
 
@@ -36,15 +37,19 @@ export const useERC20Wallet = () => {
   ) => {
     try {
       setShowSpinner(true);
+      const valueFormatted = ethers.utils.parseEther(value);
 
       const tokenContract = getTokenContract(tokenAddress);
 
-      const tx1 = await tokenContract.approve(selectedWallet.address, value);
+      const tx1 = await tokenContract.approve(
+        selectedWallet.address,
+        valueFormatted
+      );
       await tx1.wait();
 
       const tx2 = await selectedWallet.depositERC20ToWallet(
         tokenAddress,
-        value
+        valueFormatted
       );
       await tx2.wait();
 
@@ -60,7 +65,9 @@ export const useERC20Wallet = () => {
     try {
       const tokenContract = getTokenContract(tokenAddress);
 
-      const value = await tokenContract.balanceOf(selectedWallet.address);
+      const value = ethers.utils.formatUnits(
+        await tokenContract.balanceOf(selectedWallet.address)
+      );
 
       setTokenValue(value.toString());
     } catch (error) {
@@ -82,6 +89,30 @@ export const useERC20Wallet = () => {
     return new ethers.Contract(tokenAddress, ERC20ABI, provider.getSigner());
   };
 
+  const createTransactionRequestERC20 = async (
+    to: string,
+    value: string,
+    tokenAddress: string
+  ) => {
+    try {
+      setShowSpinner(true);
+      const valueFormatted = ethers.utils.parseEther(value);
+
+      const tx = await selectedWallet.createTransactionRequestForERC20(
+        to,
+        valueFormatted,
+        tokenAddress
+      );
+
+      await tx.wait();
+
+      await getAllTransactions(selectedWallet);
+    } catch (error) {
+    } finally {
+      setShowSpinner(false);
+    }
+  };
+
   return {
     depositERC20ToSelectedWallet,
     getWalletValueERC20,
@@ -89,5 +120,6 @@ export const useERC20Wallet = () => {
     tokenName,
     tokenValue,
     getTokenName,
+    createTransactionRequestERC20,
   };
 };
