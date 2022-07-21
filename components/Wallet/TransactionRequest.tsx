@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { TransactionRequest } from "../../models/TransactionRequestEther";
 import { WalletContext } from "../../state/context/walletContextProvider";
 import { formatAddress } from "../../utils/format-address";
@@ -23,23 +23,38 @@ const TransactionRequest: FC<TransactionRequest> = ({
 
   const { getTokenName, tokenName } = useERC20Wallet();
 
+  const [transactionType, setTransactionType] = useState("");
+
   useEffect(() => {
     if (isToken(erc20Token)) {
       getTokenName(erc20Token);
+      setTransactionType("ERC20");
+    } else {
+      setTransactionType("ETH");
     }
   }, []);
 
   return (
     <>
+      {transactionType === "ERC20" && (
+        <>
+          <h1 className="text-center text-2xl font-bold">{transactionType}</h1>
+          <h1>
+            Token: {formatAddress(erc20Token)} ({tokenName})
+          </h1>
+          <h1>{`Value: ${ethers.utils.formatEther(
+            value.toString()
+          )} ${tokenName}`}</h1>
+        </>
+      )}
+      {transactionType === "ETH" && (
+        <>
+          <h1 className="text-center text-2xl font-bold">{transactionType}</h1>
+          <h1>{`Value ${ethers.utils.formatEther(value.toString())} ETH`}</h1>
+        </>
+      )}
       <h1>Requester: {formatAddress(requester)}</h1>
       <h1>To: {formatAddress(to)}</h1>
-      {isToken(erc20Token) ? (
-        <h1>{`Value: ${ethers.utils.formatEther(
-          value.toString()
-        )} ${tokenName}`}</h1>
-      ) : (
-        <h1>{`Value ${ethers.utils.formatEther(value.toString())} ETH`}</h1>
-      )}
       <h1>Executed: {executed.toString()}</h1>
       <h1>Approved: {`${approved} of ${required}`}</h1>
       <div className="flex justify-evenly mt-5">
