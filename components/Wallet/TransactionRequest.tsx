@@ -5,6 +5,7 @@ import { formatAddress } from "../../utils/format-address";
 import { ethers } from "ethers";
 import Button from "../UI/Button";
 import { useERC20Wallet } from "../../hooks/useERC20Wallet";
+import { useERC721Wallet } from "../../hooks/useERC721Wallet";
 import { isToken } from "../../utils/isToken";
 
 const TransactionRequest: FC<TransactionRequest> = ({
@@ -25,10 +26,15 @@ const TransactionRequest: FC<TransactionRequest> = ({
 
   const [transactionType, setTransactionType] = useState("");
 
+  const { getNameOfToken, erc721Name } = useERC721Wallet();
+
   useEffect(() => {
     if (isToken(erc20Token)) {
       getTokenName(erc20Token);
       setTransactionType("ERC20");
+    } else if (isToken(erc721Token)) {
+      getNameOfToken(erc721Token);
+      setTransactionType("ERC721");
     } else {
       setTransactionType("ETH");
     }
@@ -51,6 +57,13 @@ const TransactionRequest: FC<TransactionRequest> = ({
         <>
           <h1 className="text-center text-2xl font-bold">{transactionType}</h1>
           <h1>{`Value ${ethers.utils.formatEther(value.toString())} ETH`}</h1>
+        </>
+      )}
+      {transactionType === "ERC721" && (
+        <>
+          <h1 className="text-center text-2xl font-bold">{transactionType}</h1>
+          <h1>Token: {formatAddress(erc721Token)}</h1>
+          <h1>{`Token id:${value} (${erc721Name})`}</h1>
         </>
       )}
       <h1>Requester: {formatAddress(requester)}</h1>

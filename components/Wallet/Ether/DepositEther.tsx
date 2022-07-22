@@ -2,7 +2,6 @@ import { Formik } from "formik";
 import { useEtherWallet } from "../../../hooks/useEtherWallet";
 import Button from "../../UI/Button";
 import Input from "../../UI/Input";
-import Spinner from "../../UI/Spinner";
 
 const DepositEther = () => {
   const { etherValue, depositEtherToSelectedWallet, showSpinner } =

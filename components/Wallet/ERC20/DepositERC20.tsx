@@ -1,5 +1,4 @@
 import { Formik } from "formik";
-import { useEffect, useState } from "react";
 import { useERC20Wallet } from "../../../hooks/useERC20Wallet";
 import Input from "../../UI/Input";
 import Button from "../../UI/Button";
