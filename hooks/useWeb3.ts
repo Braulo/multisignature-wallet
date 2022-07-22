@@ -4,11 +4,13 @@ import { useReducer } from "react";
 interface IInitialReducerWeb3State {
   provider: ethers.providers.Web3Provider;
   userAddress: string;
+  isLoading: boolean;
 }
 
 const initialState: IInitialReducerWeb3State = {
   provider: {} as ethers.providers.Web3Provider,
   userAddress: "",
+  isLoading: true,
 };
 
 const web3Reducer = (
@@ -16,6 +18,8 @@ const web3Reducer = (
   action: { type: string; payload: any }
 ): IInitialReducerWeb3State => {
   switch (action.type) {
+    case "SET_LOADING":
+      return { ...state, isLoading: action.payload };
     case "SET_PROVIDER":
       return {
         ...state,
@@ -61,6 +65,7 @@ export const useWeb3 = () => {
   };
 
   const automaticWalletConnect = async () => {
+    dispatch({ type: "SET_LOADING", payload: true });
     const provider = getProvider();
 
     const accounts = await provider.listAccounts();
@@ -69,9 +74,12 @@ export const useWeb3 = () => {
       registerProviderEvents();
       setUser(provider, await provider.getSigner().getAddress());
     }
+    dispatch({ type: "SET_LOADING", payload: false });
   };
 
   const connectWallet = async () => {
+    dispatch({ type: "SET_LOADING", payload: true });
+
     if ((window as any).ethereum) {
       try {
         const provider = getProvider();
@@ -80,6 +88,8 @@ export const useWeb3 = () => {
         setUser(provider, await provider.getSigner().getAddress());
       } catch (error) {
         console.log(error);
+      } finally {
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     } else {
       alert("Please download Metamask");

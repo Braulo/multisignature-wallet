@@ -4,13 +4,17 @@ import Button from "../../components/UI/Button";
 import { useContext, useState } from "react";
 import { WalletContext } from "../../state/context/walletContextProvider";
 import { ethers } from "ethers";
+import { useRouteGuard } from "../../hooks/useRouteGuard";
 
 const CreateMultisigWallet = () => {
   const {
     createNewWallet,
     state: { loading },
   } = useContext(WalletContext);
+
   const [message, setMessage] = useState("");
+
+  useRouteGuard();
 
   return (
     <>
@@ -20,8 +24,7 @@ const CreateMultisigWallet = () => {
         </h1>
         <Formik
           initialValues={{
-            admins:
-              "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;0x70997970C51812dc3A010C7d01b50e0d17dc79C8;0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            admins: "",
             required: "",
           }}
           validate={({ admins, required }) => {
@@ -69,7 +72,7 @@ const CreateMultisigWallet = () => {
           }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <textarea
-                className="text-black h-20"
+                className="text-black h-20 border-2 border-dark-secondary"
                 name="admins"
                 onChange={handleChange}
                 onBlur={handleBlur}

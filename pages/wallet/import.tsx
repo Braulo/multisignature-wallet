@@ -4,9 +4,12 @@ import { useContext } from "react";
 import { WalletContext } from "../../state/context/walletContextProvider";
 import { Formik } from "formik";
 import { ethers } from "ethers";
+import { useRouteGuard } from "../../hooks/useRouteGuard";
 
 const ImportMultiSigWallet = () => {
   const walletContext = useContext(WalletContext);
+
+  useRouteGuard();
 
   return (
     <>

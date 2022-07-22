@@ -7,6 +7,7 @@ import TransactionRequests from "../../../components/Wallet/TransactionRequestsA
 import { ethers } from "ethers";
 import { Web3Context } from "../../../state/context/web3ContextProvider";
 import AdminList from "../../../components/Wallet/AdminList";
+import { useRouteGuard } from "../../../hooks/useRouteGuard";
 
 const Wallet = () => {
   const router = useRouter();
@@ -19,6 +20,8 @@ const Wallet = () => {
   } = useContext(Web3Context);
 
   const [validWallet, setIsValidWallet] = useState(false);
+
+  useRouteGuard();
 
   useEffect(() => {
     if (address) {

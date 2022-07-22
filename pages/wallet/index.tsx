@@ -1,16 +1,21 @@
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { useRouteGuard } from "../../hooks/useRouteGuard";
 import { WalletContext } from "../../state/context/walletContextProvider";
+import { Web3Context } from "../../state/context/web3ContextProvider";
 
 const MyWallets = () => {
   const {
     state: { walletContractsAddresses },
   } = useContext(WalletContext);
+
   const router = useRouter();
 
   const openContractHandler = (address: string) => {
     router.push("/wallet/my/" + address);
   };
+
+  useRouteGuard();
 
   return (
     <>
