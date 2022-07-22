@@ -11,7 +11,7 @@ const TransactionRequestsAll = () => {
 
   return (
     <>
-      <h1 className="text-2xl font-bold">Transactions/ Requests:</h1>
+      <h1 className="text-2xl font-bold">Transactions/ Requests</h1>
       {showSpinner && <Spinner />}
       <ul>
         {transactionRequests?.map((transaction) => (
