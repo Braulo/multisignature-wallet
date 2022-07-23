@@ -1,8 +1,7 @@
 import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useRouteGuard } from "../../hooks/useRouteGuard";
 import { WalletContext } from "../../state/context/walletContextProvider";
-import { Web3Context } from "../../state/context/web3ContextProvider";
 
 const MyWallets = () => {
   const {
