@@ -33,7 +33,7 @@ Now you are all set and good to use this app
 ```
 
 A verified contract can be found on the goerli network = <br>
-[0xC2c8809CC17aE602495e1bE04847fFCB142dA9d2](https://goerli.etherscan.io/address/0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d)
+[0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d](https://goerli.etherscan.io/address/0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d)
 
 ### Documentation
 
