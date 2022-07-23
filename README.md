@@ -2,8 +2,6 @@
 
 This repository contains a simple fully tested n of m\* MultiSigWallet contract that can be used with ERC20, ERC721 and Ether tokens.
 
-TODO: Might develop a frontend interface in the future ;)
-
 - not all signers have to approve a transaction only until the 'required' amount is reached
 
 ### Development
@@ -35,7 +33,7 @@ Now you are all set and good to use this app
 ```
 
 A verified contract can be found on the goerli network = <br>
-[0xC2c8809CC17aE602495e1bE04847fFCB142dA9d2](https://goerli.etherscan.io/address/0xC2c8809CC17aE602495e1bE04847fFCB142dA9d2)
+[0xC2c8809CC17aE602495e1bE04847fFCB142dA9d2](https://goerli.etherscan.io/address/0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d)
 
 ### Documentation
 
