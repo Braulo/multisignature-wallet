@@ -4,6 +4,9 @@ This repository contains a simple, fully tested n of m\* multi-signature-wallet 
 
 - not all signers have to approve a transaction only until the 'required' amount is reached
 
+- A verified contract can be found on the goerli network = <br>
+  [0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d](https://goerli.etherscan.io/address/0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d)
+
 ### Development
 
 1. Install all node packages
@@ -31,9 +34,6 @@ Now you are all set and good to use this app
 ```bash
 > npx hardhat run scripts/deploy.js --network ...
 ```
-
-A verified contract can be found on the goerli network = <br>
-[0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d](https://goerli.etherscan.io/address/0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d)
 
 ### Deployment
 
