@@ -35,6 +35,16 @@ Now you are all set and good to use this app
 A verified contract can be found on the goerli network = <br>
 [0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d](https://goerli.etherscan.io/address/0x123c75cB21f28C68bca4F25Bb06ce43c77881e2d)
 
+### Deployment
+
+```bash
+> docker build . --tag multisig-wallet-image
+```
+
+```bash
+> docker run -p PORT:PORT --name multisig-wallet-contianer multisig-wallet-image
+```
+
 ### Documentation
 
 see contract comments.
